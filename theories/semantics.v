@@ -9,7 +9,7 @@ From callcc_logics Require Import syntax.
 (* ------------------------------------------------------------------------- *)
 (** Values. *)
 
-Notation of_val := Val (only parsing).
+Abbreviation of_val := Val (only parsing).
 Definition to_val (e : expr) : option val :=
   match e with Val v => Some v | _ => None end.
 
@@ -316,12 +316,12 @@ Instance fill_inj k : Inj (=) (=) (fill k).
 Proof. induction k; intros ???; simplify_eq/=; auto with f_equal. Qed.
 
 Lemma fill_app k k' e : fill (k ++ k') e = fill k (fill k' e).
-Proof. by induction k as [|f k]; simpl; [|rewrite IHk]. Qed.
+Proof. by induction k as [|f k]; simpl; [|rw IHk]. Qed.
 
 Lemma fill_val k e v : to_val (fill k e) = Some v → k = [] ∧ e = Val v.
 Proof.
   destruct k as [|f k].
-  - by intro H; rewrite -(of_to_val _ _ H).
+  - by intro H; rw -(of_to_val _ _ H).
   - by destruct f; naive_solver.
 Qed.
 
@@ -332,7 +332,7 @@ Proof.
 Qed.
 
 Lemma fill_inv' k e e' : fill k e = e' → get_frame e' = None → k = [] ∧ e = e'.
-Proof. intros <- Hget_frame. by rewrite (fill_inv _ _ Hget_frame). Qed.
+Proof. intros <- Hget_frame. by rw (fill_inv _ _ Hget_frame). Qed.
 
 Lemma fill_val_inv k e v : fill k e = Val v → k = [] ∧ e = Val v.
 Proof. intros ?. by apply fill_inv'. Qed.
@@ -374,11 +374,11 @@ Proof.
   induction (sub_expr_wf e).
   intros e' k'.
   rename x into e, H0 into IH, H into Hacc.
-  rewrite get_ectx_alt.
+  rw get_ectx_alt.
   destruct (get_frame e) as [(f, e'')|] eqn:Hget_frame; last
   by injection 1 as <- <-.
   destruct (get_ectx e'') as (k'', e''') eqn:He''.
-  injection 1 as <- <-. simpl. rewrite -(IH e''); last done.
+  injection 1 as <- <-. simpl. rw -(IH e''); last done.
   - by apply get_frame_Some.
   - by exists f.
 Qed.
@@ -386,7 +386,7 @@ Qed.
 Lemma get_frame_fill_frame f e :
   to_val e = None →
   get_frame (fill_frame f e) = Some (f, e).
-Proof. by intros He; destruct f=>//=; rewrite He. Qed.
+Proof. by intros He; destruct f=>//=; rw He. Qed.
 
 Lemma get_ectx_fill_frame e e' f k :
   to_val e = None →
@@ -394,8 +394,8 @@ Lemma get_ectx_fill_frame e e' f k :
   get_ectx (fill_frame f e) = (f :: k, e').
 Proof.
   intros Hval He.
-  rewrite get_ectx_alt get_frame_fill_frame; [|done].
-  by rewrite -He.
+  rw get_ectx_alt get_frame_fill_frame; [|done].
+  by rw -He.
 Qed.
 
 Lemma get_ectx_fill e e' k k' :
@@ -404,8 +404,8 @@ Lemma get_ectx_fill e e' k k' :
   get_ectx (fill k' e) = (k' ++ k, e').
 Proof.
   revert e e' k; induction k'; intros ??? Hval Hget_ectx.
-  - by rewrite -Hget_ectx.
-  - simpl. rewrite (get_ectx_fill_frame _ e' _ (k' ++ k)); first done.
+  - by rw -Hget_ectx.
+  - simpl. rw (get_ectx_fill_frame _ e' _ (k' ++ k)); first done.
     + by apply fill_not_val.
     + symmetry. by apply IHk'.
 Qed.
@@ -431,21 +431,21 @@ Proof.
   induction k1 as [|f k1 _] using rev_ind.
   - simpl. injection 1. intros <- <-.
     simplify_eq. simpl. by apply of_to_val.
-  - rewrite reverse_app reverse_singleton. simpl.
-    rewrite reverse_involutive.
+  - rw reverse_app reverse_singleton. simpl.
+    rw reverse_involutive.
     injection 1. intros <- <-. simplify_eq.
-    rewrite fill_app //=. do 2 f_equal.
+    rw fill_app //=. do 2 f_equal.
     by apply of_to_val.
 Qed.
 
 Ltac solve_get_redex_fill :=
-  rewrite /get_redex;
+  rw /get_redex;
   match goal with | |- _ = (?k, _) =>
     erewrite (get_ectx_fill' _ _ (fill k _) _ _), reverse_app; simpl; auto
   end;
   simpl;
-  try rewrite reverse_involutive;
-  try rewrite app_nil_r.
+  try rw reverse_involutive;
+  try rw app_nil_r.
 
 Lemma get_redex_fill_callcc k x e :
   get_redex (fill k (Callcc x e)) = (k, Callcc x e).
@@ -539,6 +539,7 @@ Lemma get_redex_fill_xchg k v0 v1 :
   get_redex (fill k (Xchg (Val v0) (Val v1))) = (k, Xchg (Val v0) (Val v1)).
 Proof. by solve_get_redex_fill. Qed.
 
+Create Rewrite HintDb get_redex_fill_db.
 Hint Rewrite
   get_redex_fill_rec get_redex_fill_app
   get_redex_fill_unop get_redex_fill_binop
@@ -710,26 +711,26 @@ Fixpoint heap_array (l : loc) (vs : list val) : gmap loc (option val) :=
   end.
 
 Lemma heap_array_singleton l v : heap_array l [v] = {[l := Some v]}.
-Proof. by rewrite /heap_array right_id. Qed.
+Proof. by rw /heap_array right_id. Qed.
 
 Lemma heap_array_lookup l vs ow k :
   heap_array l vs !! k = Some ow ↔
   ∃ j w, (0 ≤ j)%Z ∧ k = l +ₗ j ∧ ow = Some w ∧ vs !! (Z.to_nat j) = Some w.
 Proof.
   revert k l; induction vs as [|v' vs IH]=> l' l /=.
-  { rewrite lookup_empty. naive_solver lia. }
-  rewrite -insert_union_singleton_l lookup_insert_Some IH. split.
+  { rw lookup_empty. naive_solver lia. }
+  rw -insert_union_singleton_l lookup_insert_Some IH. split.
   - intros [[-> ?] | (Hl & j & w & ? & -> & -> & ?)].
-    { eexists 0, _. rewrite Loc.add_0. naive_solver lia. }
-    eexists (1 + j)%Z, _. rewrite Loc.add_assoc !Z.add_1_l Z2Nat.inj_succ; auto with lia.
+    { eexists 0, _. rw Loc.add_0. naive_solver lia. }
+    eexists (1 + j)%Z, _. rw Loc.add_assoc !Z.add_1_l Z2Nat.inj_succ; auto with lia.
   - intros (j & w & ? & -> & -> & Hil). destruct (decide (j = 0)); simplify_eq/=.
-    { rewrite Loc.add_0; eauto. }
+    { rw Loc.add_0; eauto. }
     right. split.
-    { rewrite -{1}(Loc.add_0 l). intros ?%(inj (Loc.add _)); lia. }
+    { rw -{1}(Loc.add_0 l). intros ?%(inj (Loc.add _)); lia. }
     assert (Z.to_nat j = S (Z.to_nat (j - 1))) as Hj.
-    { rewrite -Z2Nat.inj_succ; last lia. f_equal; lia. }
-    rewrite Hj /= in Hil.
-    eexists (j - 1)%Z, _. rewrite Loc.add_assoc Z.add_sub_assoc Z.add_simpl_l.
+    { rw -Z2Nat.inj_succ; last lia. f_equal; lia. }
+    rw Hj /= in Hil.
+    eexists (j - 1)%Z, _. rw Loc.add_assoc Z.add_sub_assoc Z.add_simpl_l.
     auto with lia.
 Qed.
 
@@ -739,7 +740,7 @@ Lemma heap_array_map_disjoint (h : gmap loc (option val)) (l : loc) (vs : list v
 Proof.
   intros Hdisj. apply map_disjoint_spec=> l' v1 v2.
   intros (j&w&?&->&?&Hj%lookup_lt_Some%inj_lt)%heap_array_lookup.
-  move: Hj. rewrite Z2Nat.id // => ?. by rewrite Hdisj.
+  move: Hj. rw Z2Nat.id // => ?. by rw Hdisj.
 Qed.
 
 (* [h] is added on the right here to make [state_init_heap_singleton] true. *)
@@ -749,8 +750,8 @@ Definition state_init_heap (l : loc) (n : Z) (v : val) (σ : state) : state :=
 Lemma state_init_heap_singleton l v σ :
   state_init_heap l 1 v σ = state_upd_heap <[l:=Some v]> σ.
 Proof.
-  destruct σ as [h]. rewrite /state_init_heap /=. f_equiv.
-  rewrite right_id insert_union_singleton_l. done.
+  destruct σ as [h]. rw /state_init_heap /=. f_equiv.
+  rw right_id insert_union_singleton_l. done.
 Qed.
 
 (* Reduction steps independent on the evaluation context. *)
@@ -877,7 +878,7 @@ Proof.
   intros. apply Call1ccSStep; try done.
   intros. apply not_elem_of_dom.
   specialize (Loc.fresh_fresh (dom σ.(heap)) 0) as Hnot_in.
-  rewrite Loc.add_0 in Hnot_in. by apply Hnot_in.
+  rw Loc.add_0 in Hnot_in. by apply Hnot_in.
 Qed.
 
 Lemma base_step_call1cc0 k' k e σ :
@@ -889,7 +890,7 @@ Proof.
   intros. apply Call1cc0Step; try done.
   intros. apply not_elem_of_dom.
   specialize (Loc.fresh_fresh (dom σ.(heap)) 0) as Hnot_in.
-  rewrite Loc.add_0 in Hnot_in. by apply Hnot_in.
+  rw Loc.add_0 in Hnot_in. by apply Hnot_in.
 Qed.
 
 (* Reduction relation. *)

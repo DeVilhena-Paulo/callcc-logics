@@ -54,7 +54,7 @@ Section pure_steps.
   Lemma pure_step_ectx_fill k e1 e2 :
     pure_step_ectx e1 e2 →
     pure_step_ectx (fill k e1) (fill k e2).
-  Proof. intros He12. intros k'. rewrite -!fill_app. by apply He12. Qed.
+  Proof. intros He12. intros k'. rw -!fill_app. by apply He12. Qed.
 
   Lemma pure_step_ectx_pure_step e1 e2 :
     pure_step_ectx e1 e2 →
@@ -101,14 +101,14 @@ Section pure_steps.
     intros (k' & e' & σ' & efs & Hstep).
     revert k' e' σ' efs Hstep.
     induction 1;
-    by rewrite /get_redex;
+    by rw /get_redex;
       (match goal with
       | |- (let '(k0, e0) := get_ectx (fill ?K ?E) in _) = _ =>
           erewrite (get_ectx_fill' E _ _ _ K)
       end);
       try done; simpl;
-      try rewrite app_nil_r;
-      try rewrite reverse_app //= reverse_involutive.
+      try rw app_nil_r;
+      try rw reverse_app //= reverse_involutive.
   Qed.
 
   Lemma base_reducible_get_redex' k e σ k' e' σ' efs :
@@ -124,8 +124,8 @@ Section pure_steps.
   Proof.
     intros He1 He2 Hfill.
     specialize (f_equal get_redex Hfill).
-    rewrite (base_reducible_get_redex _ _ _ He1).
-    rewrite (base_reducible_get_redex _ _ _ He2).
+    rw (base_reducible_get_redex _ _ _ He1).
+    rw (base_reducible_get_redex _ _ _ He2).
     by intros [= <- <-].
   Qed.
 

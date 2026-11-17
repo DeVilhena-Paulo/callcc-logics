@@ -7,10 +7,13 @@ From callcc_logics Require Export logic class_instances tactics.
 
 From iris.prelude Require Import options.
 
+(** Rewriting with [TCEq] hypotheses (e.g. [intros ->]) needs this scheme. *)
+Scheme Rewriting for TCEq.
+
 (** A special version of TCSimpl which also simplies [fill (K1 ++ K2) e] *)
 Class TCSimplExpr (e e' : expr) := TCSimplExpr_TCSimpl : TCSimpl e e'.
 Global Hint Extern 0 (TCSimplExpr _ _) =>
-  repeat rewrite (fill_app _ _ _); notypeclasses refine TCSimpl_TCEq : typeclass_instances.
+  repeat rw (fill_app _ _ _); notypeclasses refine TCSimpl_TCEq : typeclass_instances.
 Global Hint Mode TCSimplExpr - - : typeclass_instances.
 
 Lemma TCSimplExpr_eq (e e' : expr) : TCSimplExpr e e' ↔ e = e'.
@@ -38,11 +41,11 @@ Class MakeAnd (P Q PQ : Prop) := make_and : P ∧ Q ↔ PQ.
 Global Hint Mode MakeAnd ! ! - : typeclass_instances.
 
 Global Instance make_and_true_l P : MakeAnd True P P.
-Proof. rewrite /MakeAnd. tauto. Qed.
+Proof. rw /MakeAnd. tauto. Qed.
 Global Instance make_and_true_r P : MakeAnd P True P.
-Proof. rewrite /MakeAnd. tauto. Qed.
+Proof. rw /MakeAnd. tauto. Qed.
 Global Instance make_and_default P Q : MakeAnd P Q (P ∧ Q) | 100.
-Proof. by rewrite /MakeAnd. Qed.
+Proof. by rw /MakeAnd. Qed.
 
 (** [IntoCtx] instances *)
 Global Instance into_ctx_nil e P :
@@ -153,11 +156,11 @@ Class MakeApp {A} (k1 k2 l : list A) := make_app : l = k1 ++ k2.
 Global Hint Mode MakeApp ! ! ! - : typeclass_instances.
 
 Global Instance make_app_nil_l {A} (l : list A) : MakeApp [] l l.
-Proof. by rewrite /MakeApp. Qed.
+Proof. by rw /MakeApp. Qed.
 Global Instance make_app_nil_r {A} (l : list A) : MakeApp l [] l.
-Proof. by rewrite /MakeApp app_nil_r. Qed.
+Proof. by rw /MakeApp app_nil_r. Qed.
 Global Instance make_app_default {A} (l1 l2 : list A) : MakeApp l1 l2 (l1 ++ l2) | 100.
-Proof. by rewrite /MakeApp. Qed.
+Proof. by rw /MakeApp. Qed.
 
 Lemma into_ctx_fill e K1 K2 K P :
   IntoCtx e P K2 →
@@ -255,12 +258,12 @@ Proof. intros ?%TCSimpl_eq. solve_do_pure_step. Qed.
 
 Global Hint Extern 1 (TCSimpl (un_op_eval ?op ?v) _) =>
   lazymatch goal with
-  | H : un_op_eval op v = _ |- _ => rewrite H
+  | H : un_op_eval op v = _ |- _ => rw H
   end : typeclass_instances.
 
 Global Hint Extern 1 (TCSimpl (bin_op_eval ?op ?v1 ?v2) _) =>
   lazymatch goal with
-  | H : bin_op_eval op v1 v2 = _ |- _ => rewrite H
+  | H : bin_op_eval op v1 v2 = _ |- _ => rw H
   end : typeclass_instances.
 
 Global Instance do_pure_step_if_true e2 e3 :
@@ -343,7 +346,7 @@ Global Hint Extern 0 (FinalizeWPCC _ _ _ _ _ (λ _ _, |==> _)%I _) =>
 Global Instance finalize_wpcc_value_upd `{!stateGS Σ} gp b R e v :
   IntoVal e v →
   FinalizeWPCC gp e b R (|==> R v) | 1.
-Proof. intros <-. constructor. rewrite -fupd_wpcc -wpcc_value. by iIntros "?". Qed.
+Proof. intros <-. constructor. rw -fupd_wpcc -wpcc_value. by iIntros "?". Qed.
 
 (** Finally, if the expressions aren't both a value,
     we simplify them both. *)
@@ -369,7 +372,7 @@ Global Instance normalize_wpcc_value `{!stateGS Σ} gp v K e e' b R R' :
   IntoVal e' v →
   NormalizeWPCC gp (R v) K e b R' →
   NormalizeWPCC gp (wp/cc ⟨gp⟩ e' @ b {{R}})%I K e b R' | 1.
-Proof. intros Hₜ [HR]. split. by rewrite HR -Hₜ  -wpcc_value. Qed.
+Proof. intros Hₜ [HR]. split. by rw HR -Hₜ  -wpcc_value. Qed.
 
 (** We only perform pure steps without a side-condition here. We could let [NormalizeWP]
     also generate side-conditions, but [IntoWand]/[FromAssumption] currently lack the ability
@@ -381,8 +384,8 @@ Proof.
   intros [? H [? -> <-]]. split.
   assert (PureExecEctx True n e (fill K e')).
   { intros _. by apply H. }
-  rewrite -wpcc_pure_step //.
-  rewrite -bi.laterN_intro. apply bi.wand_intro_r, bi.sep_elim_l. tc_solve.
+  rw -wpcc_pure_step //.
+  rw -bi.laterN_intro. apply bi.wand_intro_r, bi.sep_elim_l. tc_solve.
 Qed.
 
 Global Instance from_assumption_wpcc `{!stateGS Σ} gp p K e e' b R R' :
@@ -390,7 +393,7 @@ Global Instance from_assumption_wpcc `{!stateGS Σ} gp p K e e' b R R' :
   FromAssumption p (wp/cc ⟨gp⟩ (fill K e') @ b {{R'}})%I (wp/cc ⟨gp⟩ e @ b {{R}})%I | 2.
 Proof.
   intros [HR].
-  rewrite /FromAssumption bi.intuitionistically_if_elim. by rewrite HR.
+  rw /FromAssumption bi.intuitionistically_if_elim. by rw HR.
 Qed.
 
 Global Instance into_wand_wpcc `{!stateGS Σ} gp p e K e' b R R' S Q :
@@ -399,8 +402,8 @@ Global Instance into_wand_wpcc `{!stateGS Σ} gp p e K e' b R R' S Q :
   IntoWand p false (wp/cc ⟨gp⟩ (fill K e') @ b {{S}})%I Q (wp/cc ⟨gp⟩ e @ b {{R}})%I | 1.
 Proof.
   intros [Hwp] <-%TCSimpl_eq.
-  rewrite /IntoWand /= bi.intuitionistically_if_elim.
-  rewrite -Hwp. iIntros "H #HR".
+  rw /IntoWand /= bi.intuitionistically_if_elim.
+  rw -Hwp. iIntros "H #HR".
   iApply (wpcc_mono with "H").
   by destruct b => //=; try iModIntro; iIntros "% ? !>"; iApply "HR".
 Qed.
@@ -413,10 +416,10 @@ Global Instance into_wand_wand_wpcc `{!stateGS Σ} gp p q e K e' P P' Q b R R' :
   TCSimpl P Q →
   IntoWand p q (P' -∗ wp/cc ⟨gp⟩ fill K e' @ b {{R'}})%I Q (wp/cc ⟨gp⟩ e @ b {{R}})%I.
 Proof.
-  rewrite /FromAssumption /IntoWand.
+  rw /FromAssumption /IntoWand.
   intros [Hwp] ? <-%TCSimpl_eq.
-  rewrite bi.intuitionistically_if_elim.
-  apply bi.wand_mono; [done|]. by rewrite Hwp.
+  rw bi.intuitionistically_if_elim.
+  apply bi.wand_mono; [done|]. by rw Hwp.
 Qed.
 
 Class IsAppRec (v1 v2 : val) (f x : binder) (e' : expr) (e : expr) := {
@@ -427,7 +430,7 @@ Global Hint Mode IsAppRec - - - - - ! : typeclass_instances.
 Global Instance is_app_rec v1 v2 f x e :
   TCEq v1 (RecV f x e) →
   IsAppRec v1 v2 f x e (App (Val v1) (Val v2)).
-Proof. rewrite TCEq_eq=> ->. by constructor. Qed.
+Proof. rw TCEq_eq=> ->. by constructor. Qed.
 
 Lemma tac_wpcc_pure `{!stateGS Σ} {gp Δ Δ' e e' b R Q φ} n :
   DoPureSteps φ n e e' →
@@ -437,10 +440,10 @@ Lemma tac_wpcc_pure `{!stateGS Σ} {gp Δ Δ' e e' b R Q φ} n :
   envs_entails Δ' Q →
   envs_entails Δ (wp/cc ⟨gp⟩ e @ b {{R}})%I.
 Proof.
-  rewrite envs_entails_unseal=> -[Hsteps] Hφ HΔ [HQ] HΔ'.
-  rewrite into_laterN_env_sound HΔ' HQ {HQ HΔ HΔ'}.
-  assert (PureExecEctx φ n e e') by by rewrite /PureExecEctx.
-  rewrite -wpcc_pure_step //.
+  rw envs_entails_unseal=> -[Hsteps] Hφ HΔ [HQ] HΔ'.
+  rw into_laterN_env_sound HΔ' HQ {HQ HΔ HΔ'}.
+  assert (PureExecEctx φ n e e') by by rw /PureExecEctx.
+  rw -wpcc_pure_step //.
   apply bi.laterN_mono. auto.
 Qed.
 
@@ -451,11 +454,11 @@ Lemma tac_wpcc_rec `{!stateGS Σ} {gp Δ Δ' e' v1 v2 f x e K b R Q} :
   envs_entails Δ' Q →
   envs_entails Δ (wp/cc ⟨gp⟩ e @ b {{R}})%I.
 Proof.
-  rewrite envs_entails_unseal=> -[? -> [-> ->]] HΔ [HQ] HΔ'.
-  rewrite into_laterN_env_sound HΔ' HQ /=.
+  rw envs_entails_unseal=> -[? -> [-> ->]] HΔ [HQ] HΔ'.
+  rw into_laterN_env_sound HΔ' HQ /=.
   assert (PureExecEctx True 1 (fill K ((rec: f x := e')%V v2)) (fill K (subst' x v2 (subst' f (rec: f x := e') e')))).
   { apply PureExecEctx_fill, DoPureSteps_PureExecEctx. apply _. }
-  rewrite -wpcc_pure_step //.
+  rw -wpcc_pure_step //.
   apply bi.later_mono. auto.
 Qed.
 

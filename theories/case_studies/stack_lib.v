@@ -53,7 +53,7 @@ Section stack_lib.
       is_stack := is_stack';
     |}.
     Next Obligation.
-      iIntros "% % HQ". rewrite /stack_create'.
+      iIntros "% % HQ". rw /stack_create'.
       wpcc_pures. iApply wpcc_alloc.
       iIntros "!> %r Hr _". iApply wpcc_value.
       iApply "HQ". iExists r, list_nil. iFrame.
@@ -61,7 +61,7 @@ Section stack_lib.
     Qed.
     Next Obligation.
       iIntros "% % % % % Hs HQ".
-      rewrite /stack_push'. wpcc_pures.
+      rw /stack_push'. wpcc_pures.
       iDestruct "Hs" as "(% & % & -> & Hr & Hl)".
       iApply (wpcc_load with "Hr").
       iIntros "!> Hr".
@@ -74,7 +74,7 @@ Section stack_lib.
     Qed.
     Next Obligation.
       iIntros "% % % % % Hs HQ".
-      rewrite /stack_pop'. wpcc_pures.
+      rw /stack_pop'. wpcc_pures.
       iDestruct "Hs" as "(% & % & -> & Hr & Hl)".
       iApply (wpcc_load with "Hr").
       iIntros "!> Hr".

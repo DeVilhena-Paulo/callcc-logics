@@ -40,7 +40,7 @@ Section lazy_sequences.
   (* [isSeq_pre] is contractive, therefore it admits a fixpoint. *)
   Local Instance isSeq_pre_contractive : Contractive isSeq_pre.
   Proof.
-    rewrite /isSeq_pre /isHead_pre => n isSeq isSeq' HisSeq ???.
+    rw /isSeq_pre /isHead_pre => n isSeq isSeq' HisSeq ???.
     f_equiv=>?. simpl. repeat (f_contractive || f_equiv); try by apply HisSeq.
   Qed.
   Definition isSeq_def : val -d> list val -d> list val -d> iPropO Σ :=
@@ -50,7 +50,7 @@ Section lazy_sequences.
   Definition isHead := isHead_pre isSeq.
   Definition isSeq_eq : isSeq = isSeq_def := isSeq_aux.(seal_eq).
   Global Lemma isSeq_unfold k us vs : isSeq k us vs ⊣⊢ isSeq_pre isSeq k us vs.
-  Proof. by rewrite isSeq_eq/isSeq_def;apply(fixpoint_unfold isSeq_pre). Qed.
+  Proof. by rw isSeq_eq/isSeq_def;apply(fixpoint_unfold isSeq_pre). Qed.
   Global Lemma isHead_unfold :
     isHead = isHead_pre isSeq.
   Proof. done. Qed.
@@ -105,8 +105,8 @@ Section specification_and_verification.
 
   Lemma invert1cc_correct : ⊢ invert1cc_spec.
   Proof.
-    iIntros (xs iter) "Hiter". rewrite /invert1cc. wpcc_pures. iModIntro.
-    rewrite !isSeq_unfold isSeq_eq /isSeq_pre. wpcc_pures.
+    iIntros (xs iter) "Hiter". rw /invert1cc. wpcc_pures. iModIntro.
+    rw !isSeq_unfold isSeq_eq /isSeq_pre. wpcc_pures.
     iApply wpcc_call1cc0.
     iIntros "!> %k Hk". simpl.
     iApply wpcc_alloc. iIntros "!> %r Hr _". wpcc_pures.
@@ -121,13 +121,13 @@ Section specification_and_verification.
         iApply (wpcc_cont' with "Hk").
         simpl. iExists _. iSplit; [done|].
         iNext.
-        rewrite !isSeq_unfold isSeq_eq /isSeq_pre. wpcc_pures.
+        rw !isSeq_unfold isSeq_eq /isSeq_pre. wpcc_pures.
         iApply wpcc_call1cc0. iIntros "!> %k'' Hk''". simpl.
         iApply (wpcc_store with "Hr"). iIntros "!> Hr".
         wpcc_pures. iApply (wpcc_cont' with "Hk'").
-        iExists k''. rewrite isHead_unfold isSeq_eq. by iFrame.
+        iExists k''. rw isHead_unfold isSeq_eq. by iFrame.
       }
-      { iExists k. rewrite isHead_unfold isSeq_eq. by iFrame. }
+      { iExists k. rw isHead_unfold isSeq_eq. by iFrame. }
     }
     simpl.
     iIntros "% [%k' [Hr Hk']] !>". wpcc_pures.

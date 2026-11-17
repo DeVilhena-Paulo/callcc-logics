@@ -32,11 +32,11 @@ Section callcc_one_shot.
 End callcc_one_shot.
 
 Notation "'call/cc-one-shot-div:' k ',' e" := (callcc_one_shot diverge (Lam k%binder e%E))
-  (at level 200, k at level 1, e at level 200,
+  (at level 10, k at level 1, e at level 200,
    format "'[hv' 'call/cc-one-shot-div:'  k ','  '/  ' e ']'") : expr_scope.
 
 Notation "'call/cc-one-shot-block:' k ',' e" := (callcc_one_shot block (Lam k%binder e%E))
-  (at level 200, k at level 1, e at level 200,
+  (at level 10, k at level 1, e at level 200,
    format "'[hv' 'call/cc-one-shot-block:'  k ','  '/  ' e ']'") : expr_scope.
 
 
@@ -50,7 +50,7 @@ Section rules.
     ▷ (∀ k, isKont k Φ -∗ wp/cc (subst' x k e) @ NoFrame {{ Φ }}) -∗
     wp/cc (call/cc-one-shot-div: x, e)%E @ NoFrame {{ Φ }}.
   Proof.
-    iIntros "Hwpcc". rewrite /callcc_one_shot //=.
+    iIntros "Hwpcc". rw /callcc_one_shot //=.
     wpcc_pures. iApply wpcc_alloc.
     iIntros "!> %r Hr _". wpcc_pures.
     iApply fupd_wpcc.
@@ -80,7 +80,7 @@ Section rules.
     ▷ (∀ k, isCont k Φ -∗ wp/cc (subst x k e) @ WithFrame {{ _, False }}) -∗
     wp/cc (call/cc-one-shot-block: x, e)%E @ WithFrame  {{ Φ }}.
   Proof.
-    iIntros "Hwpcc". rewrite /callcc_one_shot //=.
+    iIntros "Hwpcc". rw /callcc_one_shot //=.
     wpcc_pures. iApply wpcc_alloc.
     iIntros "!> %r Hr _". wpcc_pures.
     iApply wpcc_callcc_alt.

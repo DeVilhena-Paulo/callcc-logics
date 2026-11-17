@@ -435,16 +435,17 @@ Global Instance bin_op_eq_dec : EqDecision bin_op.
 Proof. solve_decision. Defined.
 
 Section eq_decidable.
-  Notation eq_dec :=
+  Abbreviation eq_dec :=
     (λ (A : Type), λ (x : A), ∀ y, Decision (x = y)) (only parsing).
 
-  Notation P := (eq_dec  expr) (only parsing).
-  Notation Q := (eq_dec   val) (only parsing).
-  Notation R := (eq_dec frame) (only parsing).
-  Notation S := (eq_dec  ectx) (only parsing).
+  Abbreviation P := (eq_dec  expr) (only parsing).
+  Abbreviation Q := (eq_dec   val) (only parsing).
+  Abbreviation R := (eq_dec frame) (only parsing).
+  Abbreviation S := (eq_dec  ectx) (only parsing).
 
   (* Expressions. *)
   Definition eq_dec_Val_case v (Hv : Q v) : P (Val v).
+  Proof.
     refine (λ e',
       match e' with
       | Val v' => cast_if (Hv v')
@@ -453,6 +454,7 @@ Section eq_decidable.
   Defined.
 
   Definition eq_dec_Callcc_case k e (He : P e) : P (Callcc k e).
+  Proof.
     refine (λ e',
       match e' with
       | Callcc k' e' => cast_if_and (decide (k = k')) (He e')
@@ -461,6 +463,7 @@ Section eq_decidable.
   Defined.
 
   Definition eq_dec_Call1cc0_case k e (He : P e) : P (Call1cc0 k e).
+  Proof.
     refine (λ e',
       match e' with
       | Call1cc0 k' e' => cast_if_and (decide (k = k')) (He e')
@@ -469,6 +472,7 @@ Section eq_decidable.
   Defined.
 
   Definition eq_dec_Call1ccS_case k e (He : P e) : P (Call1ccS k e).
+  Proof.
     refine (λ e',
       match e' with
       | Call1ccS k' e' => cast_if_and (decide (k = k')) (He e')
@@ -477,6 +481,7 @@ Section eq_decidable.
   Defined.
 
   Definition eq_dec_Var_case x : P (Var x).
+  Proof.
     refine (λ e',
       match e' with
       | Var x' => cast_if (decide (x = x'))
@@ -485,6 +490,7 @@ Section eq_decidable.
   Defined.
 
   Definition eq_dec_Rec_case f x e (He : P e) : P (Rec f x e).
+  Proof.
     refine (λ e',
       match e' with
       | Rec f' x' e' => cast_if_and3 (decide (f = f')) (decide (x = x')) (He e')
@@ -493,6 +499,7 @@ Section eq_decidable.
   Defined.
 
   Definition eq_dec_App_case e1 e2 (He1 : P e1) (He2 : P e2) : P (App e1 e2).
+  Proof.
     refine (λ e',
       match e' with
       | App e1' e2' => cast_if_and (He1 e1') (He2 e2')
@@ -501,6 +508,7 @@ Section eq_decidable.
   Defined.
 
   Definition eq_dec_UnOp_case op e (He : P e) : P (UnOp op e).
+  Proof.
     refine (λ e',
       match e' with
       | UnOp op' e' => cast_if_and (decide (op = op')) (He e')
@@ -509,6 +517,7 @@ Section eq_decidable.
   Defined.
 
   Definition eq_dec_BinOp_case op e1 e2 (He1 : P e1) (He2 : P e2) : P (BinOp op e1 e2).
+  Proof.
     refine (λ e',
       match e' with
       | BinOp op' e1' e2' => cast_if_and3 (decide (op = op')) (He1 e1') (He2 e2')
@@ -517,6 +526,7 @@ Section eq_decidable.
   Defined.
 
   Definition eq_dec_If_case e0 e1 e2 (He0 : P e0) (He1 : P e1) (He2 : P e2) : P (If e0 e1 e2).
+  Proof.
     refine (λ e',
       match e' with
       | If e0' e1' e2' => cast_if_and3 (He0 e0') (He1 e1') (He2 e2')
@@ -525,6 +535,7 @@ Section eq_decidable.
   Defined.
 
   Definition eq_dec_Pair_case e1 e2 (He1 : P e1) (He2 : P e2) : P (Pair e1 e2).
+  Proof.
     refine (λ e',
       match e' with
       | Pair e1' e2' => cast_if_and (He1 e1') (He2 e2')
@@ -533,6 +544,7 @@ Section eq_decidable.
   Defined.
 
   Definition eq_dec_Fst_case e (He : P e) : P (Fst e).
+  Proof.
     refine (λ e',
       match e' with
       | Fst e' => cast_if (He e')
@@ -541,6 +553,7 @@ Section eq_decidable.
   Defined.
 
   Definition eq_dec_Snd_case e (He : P e) : P (Snd e).
+  Proof.
     refine (λ e',
       match e' with
       | Snd e' => cast_if (He e')
@@ -549,6 +562,7 @@ Section eq_decidable.
   Defined.
 
   Definition eq_dec_InjL_case e (He : P e) : P (InjL e).
+  Proof.
     refine (λ e',
       match e' with
       | InjL e' => cast_if (He e')
@@ -557,6 +571,7 @@ Section eq_decidable.
   Defined.
 
   Definition eq_dec_InjR_case e (He : P e) : P (InjR e).
+  Proof.
     refine (λ e',
       match e' with
       | InjR e' => cast_if (He e')
@@ -565,6 +580,7 @@ Section eq_decidable.
   Defined.
 
   Definition eq_dec_Case_case e0 e1 e2 (He0 : P e0) (He1 : P e1) (He2 : P e2) : P (Case e0 e1 e2).
+  Proof.
     refine (λ e',
       match e' with
       | Case e0' e1' e2' => cast_if_and3 (He0 e0') (He1 e1') (He2 e2')
@@ -573,6 +589,7 @@ Section eq_decidable.
   Defined.
 
   Definition eq_dec_AllocN_case e1 e2 (He1 : P e1) (He2 : P e2) : P (AllocN e1 e2).
+  Proof.
     refine (λ e',
       match e' with
       | AllocN e1' e2' => cast_if_and (He1 e1') (He2 e2')
@@ -581,6 +598,7 @@ Section eq_decidable.
   Defined.
 
   Definition eq_dec_Free_case e (He : P e) : P (Free e).
+  Proof.
     refine (λ e',
       match e' with
       | Free e' => cast_if (He e')
@@ -589,6 +607,7 @@ Section eq_decidable.
   Defined.
 
   Definition eq_dec_Load_case e (He : P e) : P (Load e).
+  Proof.
     refine (λ e',
       match e' with
       | Load e' => cast_if (He e')
@@ -597,6 +616,7 @@ Section eq_decidable.
   Defined.
 
   Definition eq_dec_Store_case e1 e2 (He1 : P e1) (He2 : P e2) : P (Store e1 e2).
+  Proof.
     refine (λ e',
       match e' with
       | Store e1' e2' => cast_if_and (He1 e1') (He2 e2')
@@ -605,6 +625,7 @@ Section eq_decidable.
   Defined.
 
   Definition eq_dec_CmpXchg_case e0 e1 e2 (He0 : P e0) (He1 : P e1) (He2 : P e2) : P (CmpXchg e0 e1 e2).
+  Proof.
     refine (λ e',
       match e' with
       | CmpXchg e0' e1' e2' => cast_if_and3 (He0 e0') (He1 e1') (He2 e2')
@@ -613,6 +634,7 @@ Section eq_decidable.
   Defined.
 
   Definition eq_dec_Xchg_case e1 e2 (He1 : P e1) (He2 : P e2) : P (Xchg e1 e2).
+  Proof.
     refine (λ e',
       match e' with
       | Xchg e1' e2' => cast_if_and (He1 e1') (He2 e2')
@@ -621,6 +643,7 @@ Section eq_decidable.
   Defined.
 
   Definition eq_dec_FAA_case e1 e2 (He1 : P e1) (He2 : P e2) : P (FAA e1 e2).
+  Proof.
     refine (λ e',
       match e' with
       | FAA e1' e2' => cast_if_and (He1 e1') (He2 e2')
@@ -629,6 +652,7 @@ Section eq_decidable.
   Defined.
 
   Definition eq_dec_Fork_case e (He : P e) : P (Fork e).
+  Proof.
     refine (λ e',
       match e' with
       | Fork e' => cast_if (He e')
@@ -637,6 +661,7 @@ Section eq_decidable.
   Defined.
 
   Definition eq_dec_RunThenAbort_case e (He : P e) : P (RunThenAbort e).
+  Proof.
     refine (λ e',
       match e' with
       | RunThenAbort e' => cast_if (He e')
@@ -646,6 +671,7 @@ Section eq_decidable.
 
   (* Values. *)
   Definition eq_dec_LitV_case l : Q (LitV l).
+  Proof.
     refine (λ v',
       match v' with
       | LitV l' => cast_if (decide (l = l'))
@@ -654,6 +680,7 @@ Section eq_decidable.
   Defined.
 
   Definition eq_dec_RecV_case f x e (He : P e) : Q (RecV f x e).
+  Proof.
     refine (λ v',
       match v' with
       | RecV f' x' e' => cast_if_and3 (decide (f = f')) (decide (x = x')) (He e')
@@ -662,6 +689,7 @@ Section eq_decidable.
   Defined.
 
   Definition eq_dec_ContV_case l k (Hk : S k) : Q (ContV l k).
+  Proof.
     refine (λ v',
       match v' with
       | ContV l' k' => cast_if_and (decide (l = l')) (Hk k')
@@ -670,6 +698,7 @@ Section eq_decidable.
   Defined.
 
   Definition eq_dec_KontV_case k (Hk : S k) : Q (KontV k).
+  Proof.
     refine (λ v',
       match v' with
       | KontV k' => cast_if (Hk k')
@@ -678,6 +707,7 @@ Section eq_decidable.
   Defined.
 
   Definition eq_dec_PairV_case v1 v2 (Hv1 : Q v1) (Hv2 : Q v2) : Q (PairV v1 v2).
+  Proof.
     refine (λ v',
       match v' with
       | PairV v1' v2' => cast_if_and (Hv1 v1') (Hv2 v2')
@@ -686,6 +716,7 @@ Section eq_decidable.
   Defined.
 
   Definition eq_dec_InjLV_case v (Hv : Q v) : Q (InjLV v).
+  Proof.
     refine (λ v',
       match v' with
       | InjLV v' => cast_if (Hv v')
@@ -694,6 +725,7 @@ Section eq_decidable.
   Defined.
 
   Definition eq_dec_InjRV_case v (Hv : Q v) : Q (InjRV v).
+  Proof.
     refine (λ v',
       match v' with
       | InjRV v' => cast_if (Hv v')
@@ -703,6 +735,7 @@ Section eq_decidable.
 
   (* Frames. *)
   Definition eq_dec_AppLCtx_case v2 (Hv2 : Q v2) : R (AppLCtx v2).
+  Proof.
     refine (λ f',
       match f' with
       | AppLCtx v2' => cast_if (Hv2 v2')
@@ -711,6 +744,7 @@ Section eq_decidable.
   Defined.
 
   Definition eq_dec_AppRCtx_case e1 (He1 : P e1) : R (AppRCtx e1).
+  Proof.
     refine (λ f',
       match f' with
       | AppRCtx e1' => cast_if (He1 e1')
@@ -719,6 +753,7 @@ Section eq_decidable.
   Defined.
 
   Definition eq_dec_UnOpCtx_case op : R (UnOpCtx op).
+  Proof.
     refine (λ f',
       match f' with
       | UnOpCtx op' => cast_if (decide (op = op'))
@@ -727,6 +762,7 @@ Section eq_decidable.
   Defined.
 
   Definition eq_dec_BinOpLCtx_case op v2 (Hv2 : Q v2) : R (BinOpLCtx op v2).
+  Proof.
     refine (λ f',
       match f' with
       | BinOpLCtx op' v2' => cast_if_and (decide (op = op')) (Hv2 v2')
@@ -735,6 +771,7 @@ Section eq_decidable.
   Defined.
 
   Definition eq_dec_BinOpRCtx_case op e1 (He1 : P e1) : R (BinOpRCtx op e1).
+  Proof.
     refine (λ f',
       match f' with
       | BinOpRCtx op' e1' => cast_if_and (decide (op = op')) (He1 e1')
@@ -743,6 +780,7 @@ Section eq_decidable.
   Defined.
 
   Definition eq_dec_IfCtx_case e1 e2 (He1 : P e1) (He2 : P e2) : R (IfCtx e1 e2).
+  Proof.
     refine (λ f',
       match f' with
       | IfCtx e1' e2' => cast_if_and (He1 e1') (He2 e2')
@@ -751,6 +789,7 @@ Section eq_decidable.
   Defined.
 
   Definition eq_dec_PairLCtx_case v2 (Hv2 : Q v2) : R (PairLCtx v2).
+  Proof.
     refine (λ f',
       match f' with
       | PairLCtx v2' => cast_if (Hv2 v2')
@@ -759,6 +798,7 @@ Section eq_decidable.
   Defined.
 
   Definition eq_dec_PairRCtx_case e1 (He1 : P e1) : R (PairRCtx e1).
+  Proof.
     refine (λ f',
       match f' with
       | PairRCtx e1' => cast_if (He1 e1')
@@ -767,6 +807,7 @@ Section eq_decidable.
   Defined.
 
   Definition eq_dec_FstCtx_case : R FstCtx.
+  Proof.
     refine (λ f',
       match f' with
       | FstCtx => left _
@@ -775,6 +816,7 @@ Section eq_decidable.
   Defined.
 
   Definition eq_dec_SndCtx_case : R SndCtx.
+  Proof.
     refine (λ f',
       match f' with
       | SndCtx => left _
@@ -783,6 +825,7 @@ Section eq_decidable.
   Defined.
 
   Definition eq_dec_InjLCtx_case : R InjLCtx.
+  Proof.
     refine (λ f',
       match f' with
       | InjLCtx => left _
@@ -791,6 +834,7 @@ Section eq_decidable.
   Defined.
 
   Definition eq_dec_InjRCtx_case : R InjRCtx.
+  Proof.
     refine (λ f',
       match f' with
       | InjRCtx => left _
@@ -799,6 +843,7 @@ Section eq_decidable.
   Defined.
 
   Definition eq_dec_CaseCtx_case e1 e2 (He1 : P e1) (He2 : P e2) : R (CaseCtx e1 e2).
+  Proof.
     refine (λ f',
       match f' with
       | CaseCtx e1' e2' => cast_if_and (He1 e1') (He2 e2')
@@ -807,6 +852,7 @@ Section eq_decidable.
   Defined.
 
   Definition eq_dec_AllocNLCtx_case v2 (Hv2 : Q v2) : R (AllocNLCtx v2).
+  Proof.
     refine (λ f',
       match f' with
       | AllocNLCtx v2' => cast_if (Hv2 v2')
@@ -815,6 +861,7 @@ Section eq_decidable.
   Defined.
 
   Definition eq_dec_AllocNRCtx_case e1 (He1 : P e1) : R (AllocNRCtx e1).
+  Proof.
     refine (λ f',
       match f' with
       | AllocNRCtx e1' => cast_if (He1 e1')
@@ -823,6 +870,7 @@ Section eq_decidable.
   Defined.
 
   Definition eq_dec_FreeCtx_case : R FreeCtx.
+  Proof.
     refine (λ f',
       match f' with
       | FreeCtx => left _
@@ -831,6 +879,7 @@ Section eq_decidable.
   Defined.
 
   Definition eq_dec_LoadCtx_case : R LoadCtx.
+  Proof.
     refine (λ f',
       match f' with
       | LoadCtx => left _
@@ -839,6 +888,7 @@ Section eq_decidable.
   Defined.
 
   Definition eq_dec_StoreLCtx_case v2 (Hv2 : Q v2) : R (StoreLCtx v2).
+  Proof.
     refine (λ f',
       match f' with
       | StoreLCtx v2' => cast_if (Hv2 v2')
@@ -847,6 +897,7 @@ Section eq_decidable.
   Defined.
 
   Definition eq_dec_StoreRCtx_case e1 (He1 : P e1) : R (StoreRCtx e1).
+  Proof.
     refine (λ f',
       match f' with
       | StoreRCtx e1' => cast_if (He1 e1')
@@ -855,6 +906,7 @@ Section eq_decidable.
   Defined.
 
   Definition eq_dec_CmpXchgLCtx_case v1 v2 (Hv1 : Q v1) (Hv2 : Q v2) : R (CmpXchgLCtx v1 v2).
+  Proof.
     refine (λ f',
       match f' with
       | CmpXchgLCtx v1' v2' => cast_if_and (Hv1 v1') (Hv2 v2')
@@ -863,6 +915,7 @@ Section eq_decidable.
   Defined.
 
   Definition eq_dec_CmpXchgMCtx_case e0 v2 (He0 : P e0) (Hv2 : Q v2) : R (CmpXchgMCtx e0 v2).
+  Proof.
     refine (λ f',
       match f' with
       | CmpXchgMCtx e0' v2' => cast_if_and (He0 e0') (Hv2 v2')
@@ -871,6 +924,7 @@ Section eq_decidable.
   Defined.
 
   Definition eq_dec_CmpXchgRCtx_case e0 e1 (He0 : P e0) (He1 : P e1) : R (CmpXchgRCtx e0 e1).
+  Proof.
     refine (λ f',
       match f' with
       | CmpXchgRCtx e0' e1' => cast_if_and (He0 e0') (He1 e1')
@@ -879,6 +933,7 @@ Section eq_decidable.
   Defined.
 
   Definition eq_dec_XchgLCtx_case v2 (Hv2 : Q v2) : R (XchgLCtx v2).
+  Proof.
     refine (λ f',
       match f' with
       | XchgLCtx v2' => cast_if (Hv2 v2')
@@ -887,6 +942,7 @@ Section eq_decidable.
   Defined.
 
   Definition eq_dec_XchgRCtx_case e1 (He1 : P e1) : R (XchgRCtx e1).
+  Proof.
     refine (λ f',
       match f' with
       | XchgRCtx e1' => cast_if (He1 e1')
@@ -895,6 +951,7 @@ Section eq_decidable.
   Defined.
 
   Definition eq_dec_FaaLCtx_case v2 (Hv2 : Q v2) : R (FaaLCtx v2).
+  Proof.
     refine (λ f',
       match f' with
       | FaaLCtx v2' => cast_if (Hv2 v2')
@@ -903,6 +960,7 @@ Section eq_decidable.
   Defined.
 
   Definition eq_dec_FaaRCtx_case e1 (He1 : P e1) : R (FaaRCtx e1).
+  Proof.
     refine (λ f',
       match f' with
       | FaaRCtx e1' => cast_if (He1 e1')
@@ -911,6 +969,7 @@ Section eq_decidable.
   Defined.
 
   Definition eq_dec_RunThenAbortCtx_case : R RunThenAbortCtx.
+  Proof.
     refine (λ f',
       match f' with
       | RunThenAbortCtx => left _
@@ -920,10 +979,12 @@ Section eq_decidable.
 
   (* Evaluation contexts. *)
   Definition eq_dec_EmptyCtx_case : S [].
+  Proof.
     by refine (λ f', match f' with [] => left _ | _ => right _ end).
   Defined.
 
   Definition eq_dec_ConsCtx_case f k (Hf : R f) (Hk : S k) : S (f :: k).
+  Proof.
     refine (λ f',
       match f' with
       | f' :: k' => cast_if_and (Hf f') (Hk k')
@@ -1102,19 +1163,19 @@ Qed.
 
 Section countable.
   (* The set of generic trees. *)
-  Notation gtree :=
+  Abbreviation gtree :=
     (gen_tree (bin_op + un_op + base_lit + string + binder))
     (only parsing).
 
-  Notation enc_binder b :=
+  Abbreviation enc_binder b :=
     (GenLeaf (inr b)) (only parsing).
-  Notation enc_string s :=
+  Abbreviation enc_string s :=
     (GenLeaf (inl (inr s))) (only parsing).
-  Notation enc_base_lit l :=
+  Abbreviation enc_base_lit l :=
     (GenLeaf (inl (inl (inr l)))) (only parsing).
-  Notation enc_un_op op :=
+  Abbreviation enc_un_op op :=
     (GenLeaf (inl (inl (inl (inr op))))) (only parsing).
-  Notation enc_bin_op op :=
+  Abbreviation enc_bin_op op :=
     (GenLeaf (inl (inl (inl (inl op))))) (only parsing).
 
   (* Encoding. *)
@@ -1553,17 +1614,17 @@ Section countable.
     with decode_ectx gk := decode_ectx_pre decode_frame decode_ectx gk
     for decode_ectx.
 
-  Notation P := (λ e, decode_expr  (encode_expr  e) = e) (only parsing).
-  Notation Q := (λ v, decode_val   (encode_val   v) = v) (only parsing).
-  Notation R := (λ f, decode_frame (encode_frame f) = f) (only parsing).
-  Notation S := (λ k, decode_ectx  (encode_ectx  k) = k) (only parsing).
+  Abbreviation P := (λ e, decode_expr  (encode_expr  e) = e) (only parsing).
+  Abbreviation Q := (λ v, decode_val   (encode_val   v) = v) (only parsing).
+  Abbreviation R := (λ f, decode_frame (encode_frame f) = f) (only parsing).
+  Abbreviation S := (λ k, decode_ectx  (encode_ectx  k) = k) (only parsing).
 
   Global Instance expr_countable : Countable expr.
   Proof.
     refine (inj_countable' encode_expr decode_expr _).
     apply (expr_ind' P Q R S); repeat intros ?; simpl;
     repeat match goal with
-    | [ H : _ = _ |- _ ] => rewrite H
+    | [ H : _ = _ |- _ ] => rw H
     end; done.
   Qed.
 

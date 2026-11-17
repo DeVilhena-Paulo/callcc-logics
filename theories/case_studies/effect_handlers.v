@@ -40,18 +40,18 @@ Section verification.
 
   Variables (hs : val).
 
-  Notation canAbort_type := (
+  Abbreviation canAbort_type := (
     list ((val -d> (val -d> iPropO Σ) -d> iPropO Σ) * (val -d> iPropO Σ)) -d>
     iPropO Σ
   ).
 
-  Notation mainPost_type := (
+  Abbreviation mainPost_type := (
     (val -d> (val -d> iPropO Σ) -d> iPropO Σ) -d>
     (val -d> iPropO Σ) -d>
     list ((val -d> (val -d> iPropO Σ) -d> iPropO Σ) * (val -d> iPropO Σ)) -d> val -d> iPropO Σ
   ).
 
-  Notation isHStack_type := (
+  Abbreviation isHStack_type := (
     list val -d>
     list ((val -d> (val -d> iPropO Σ) -d> iPropO Σ) * (val -d> iPropO Σ)) -d> iPropO Σ
   ).
@@ -91,7 +91,7 @@ Section verification.
 
   Local Instance isHStack_pre_ne : NonExpansive isHStack_pre.
   Proof.
-    rewrite /isHStack_pre /isCont /isCont_gen => n isHStack isHStack' Hne ks ΨΦs.
+    rw /isHStack_pre /isCont /isCont_gen => n isHStack isHStack' Hne ks ΨΦs.
     revert ΨΦs ks.
     induction ΨΦs as [|(Ψ, Φ) ΨΦs].
     - intros ?. by f_equiv.
@@ -102,7 +102,7 @@ Section verification.
 
   Local Instance mainPost_pre_contractive : Contractive mainPost_pre.
   Proof.
-    rewrite /mainPost_pre /isCont /isCont_gen /canAbort_pre =>
+    rw /mainPost_pre /isCont /isCont_gen /canAbort_pre =>
       n mainPost mainPost' Hne Ψ Φ ΨΦs res.
     do 9 f_equiv. f_contractive.
     do 9 f_equiv. apply isHStack_pre_ne. apply Hne.
@@ -117,7 +117,7 @@ Section verification.
   Global Lemma mainPost_unfold Ψ Φ ΨΦs res :
     mainPost Ψ Φ ΨΦs res ⊣⊢ mainPost_pre mainPost Ψ Φ ΨΦs res.
   Proof.
-    rewrite mainPost_eq /mainPost_def.
+    rw mainPost_eq /mainPost_def.
     by apply (fixpoint_unfold mainPost_pre).
   Qed.
 
@@ -149,7 +149,7 @@ Section verification.
     iIntros "HmainPost [%ks [Hhs Hstack]]".
     iDestruct (isHStack_cons with "Hstack")
       as "(% & % & -> & [Hks' Hk'])".
-    rewrite /abort.
+    rw /abort.
     wpcc_pures.
     iApply (wpcc_bind _ [AppRCtx _]).
     iApply (stack_pop_spec with "Hhs").
@@ -161,12 +161,12 @@ Section verification.
     Ψ x Φ' -∗
     wphs (perform hs x) ((Ψ, Φ) :: ΨΦs) Φ'.
   Proof.
-    rewrite /wphs /perform.
+    rw /wphs /perform.
     iIntros "Hx Hraise". wpcc_pures.
     iApply wpcc_call1cc0.
     iIntros "!> %k' Hk'". simpl. wpcc_pures.
     iApply (abort_spec with "[Hx Hk'] Hraise").
-    rewrite mainPost_unfold. iRight.
+    rw mainPost_unfold. iRight.
     iExists x, k', Φ'. iFrame. done.
   Qed.
 
@@ -194,7 +194,7 @@ Section verification.
     by iApply "Hfill".
   Qed.
 
-  Notation deep_handler_type := (
+  Abbreviation deep_handler_type := (
     (val -d> (val -d> iPropO Σ) -d> iPropO Σ) -d>
     (val -d> iPropO Σ) -d>
     val -d> val -d>
@@ -222,7 +222,7 @@ Section verification.
 
   Local Instance deep_handler_pre_contractive : Contractive deep_handler_pre.
   Proof.
-    rewrite /deep_handler_pre /wphs => n deep deep' Hne Ψ Φ effc retc ΨΦs Q.
+    rw /deep_handler_pre /wphs => n deep deep' Hne Ψ Φ effc retc ΨΦs Q.
     repeat (f_contractive || f_equiv). apply Hne.
   Qed.
   Definition deep_handler_def := fixpoint deep_handler_pre.
@@ -236,7 +236,7 @@ Section verification.
     deep_handler Ψ Φ effc retc ΨΦs Q ⊣⊢
       deep_handler_pre deep_handler Ψ Φ effc retc ΨΦs Q.
   Proof.
-    rewrite deep_handler_eq /deep_handler_def.
+    rw deep_handler_eq /deep_handler_def.
     by apply (fixpoint_unfold deep_handler_pre).
   Qed.
 
@@ -246,7 +246,7 @@ Section verification.
     wphs (handle hs effc retc comp) ΨΦs Q.
   Proof.
     iLöb as "IH" forall (comp Q).
-    iIntros "Hcomp Hhandler Hraise". rewrite /handle.
+    iIntros "Hcomp Hhandler Hraise". rw /handle.
     wpcc_pures.
     iApply (wpcc_bind _ [CaseCtx _ _]). simpl.
     iApply (wpcc_mono _ _ _ (λ res,
@@ -266,17 +266,17 @@ Section verification.
       iApply (wpcc_mono with "Hcomp"). simpl.
       iIntros "%y [Hy Hraise] !>". wpcc_pures.
       iApply (abort_spec with "[Hy] Hraise").
-      rewrite mainPost_unfold. iLeft. by iFrame.
+      rw mainPost_unfold. iLeft. by iFrame.
     }
     simpl.
     iIntros "%res [Hres Hraise] !>".
-    rewrite mainPost_unfold.
+    rw mainPost_unfold.
     iDestruct "Hres" as
       "[(%y & -> & Hy) | (%x & %k' & %Q' & -> & Hx & Hk')]".
-    - wpcc_pures. rewrite deep_handler_unfold.
+    - wpcc_pures. rw deep_handler_unfold.
       iDestruct "Hhandler" as "[Hretc _]".
       by iApply ("Hretc" with "Hy Hraise").
-    - wpcc_pures. rewrite deep_handler_unfold.
+    - wpcc_pures. rw deep_handler_unfold.
       iDestruct "Hhandler" as "[_ Heffc]".
       iApply ("Heffc" with "Hx [Hk'] Hraise").
       iIntros "%y %Q'' Hy Hhandler Hraise".

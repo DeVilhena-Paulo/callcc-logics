@@ -81,28 +81,28 @@ Section verification.
 
   Local Instance inv_pre_contractive return' q : Contractive (inv_pre return' q).
   Proof.
-    rewrite /inv_pre => n inv inv' IH.
-    do 7 f_equiv. f_contractive. rewrite /isCont /isCont_gen. do 5 f_equiv.
+    rw /inv_pre => n inv inv' IH.
+    do 7 f_equiv. f_contractive. rw /isCont /isCont_gen. do 5 f_equiv.
     by apply IH.
   Qed.
   Definition inv_def return' q : iPropO Σ :=
     fixpoint (inv_pre return' q).
-  Definition inv_aux return' q : seal (inv_def return' q). by eexists. Qed.
+  Definition inv_aux return' q : seal (inv_def return' q). Proof. by eexists. Qed.
   Definition inv return' q := (inv_aux return' q).(unseal).
   Definition inv_eq return' q : inv return' q = inv_def return' q :=
     (inv_aux return' q).(seal_eq).
   Global Lemma inv_unfold return' q :
     inv return' q ⊣⊢ inv_pre return' q (inv return' q).
-  Proof. by rewrite inv_eq /inv_def;
+  Proof. by rw inv_eq /inv_def;
     apply (fixpoint_unfold (inv_pre return' q)). Qed.
 
   Lemma inv_intro return' q :
     inv_pre return' q (inv return' q) ⊢ inv return' q.
-  Proof. iIntros "?". by rewrite -inv_unfold. Qed.
+  Proof. iIntros "?". by rw -inv_unfold. Qed.
  
   Lemma with_coop_correct : ⊢ with_coop_spec.
   Proof.
-    iIntros "%main Hmain". rewrite /with_coop. wpcc_pures.
+    iIntros "%main Hmain". rw /with_coop. wpcc_pures.
     iApply wpcc_call1cc0.
     iIntros "!> %return' Hreturn". simpl.
     iApply (wpcc_bind _ [_]).
@@ -120,7 +120,7 @@ Section verification.
           @ WithFrame {{Q}}
     )%I as "#Hnext".
     { iIntros "!> %Q Hinv".
-      iEval (rewrite inv_unfold) in "Hinv".
+      iEval (rw inv_unfold) in "Hinv".
       iDestruct "Hinv" as "[%ks' (Hreturn' & Hq & Hks')]".
       iApply (wpcc_bind _ [_]).
       iApply (queue_empty_spec with "Hq").
@@ -128,14 +128,14 @@ Section verification.
       destruct (ks') as [|k ks] eqn:Heq.
       + simpl. wpcc_pures.
         by iApply (wpcc_cont with "Hreturn'").
-      + rewrite length_cons.
+      + rw length_cons.
         destruct (k :: ks) as [|k'' ks'' _] eqn:Heq' using rev_ind; first done.
-        rewrite big_sepL_app. simpl. wpcc_pures.
+        rw big_sepL_app. simpl. wpcc_pures.
         iDestruct "Hks'" as "(Hks''&Hk''&_)".
         iApply (wpcc_bind _ [_]).
         iApply (queue_take_spec with "Hq"). iIntros "!> Hq". wpcc_pures.
         iApply (wpcc_cont with "Hk''").
-        iEval (rewrite inv_unfold). iExists ks''.
+        iEval (rw inv_unfold). iExists ks''.
         iFrame.
         iApply big_sepL_mono; last done.
         by iIntros "% % _ ? !>".
@@ -145,20 +145,20 @@ Section verification.
     iApply (wpcc_mono with "[Hmain Hq Hreturn]");
     first iApply ("Hmain" $! _ _ (inv return' q));
     cycle 2.
-    { rewrite {-1}inv_unfold. iExists []. by iFrame. }
+    { rw {-1}inv_unfold. iExists []. by iFrame. }
     { simpl.
       iIntros "% Hinv !>". wpcc_pures.
       by iApply ("Hnext" with "Hinv"). }
     { iIntros "!> %task Hinv Htask". wpcc_pures.
       iApply wpcc_call1cc0. iIntros "!> %k Hk". simpl.
-      iEval (rewrite inv_unfold) in "Hinv".
+      iEval (rw inv_unfold) in "Hinv".
       iDestruct "Hinv" as "[%ks' (Hreturn' & Hq & Hks')]".
       iApply (wpcc_bind _ [_]).
       iApply (queue_add_spec with "Hq").
       iIntros "!> Hq". wpcc_pures.
       iApply (wpcc_bind _ [_]).
       iApply (wpcc_mono with "[Htask Hk Hq Hks' Hreturn']").
-      { iApply "Htask". iEval (rewrite inv_unfold).
+      { iApply "Htask". iEval (rw inv_unfold).
         iExists (k :: ks'). iFrame.
         iFrame. iApply big_sepL_mono; last done.
         by iIntros "% % _ ? !>".
@@ -169,13 +169,13 @@ Section verification.
     }
     { iIntros "!> Hinv". wpcc_pures.
       iApply wpcc_call1cc0. iIntros "!> %k Hk". simpl.
-      iEval (rewrite inv_unfold) in "Hinv".
+      iEval (rw inv_unfold) in "Hinv".
       iDestruct "Hinv" as "[%ks' (Hreturn' & Hq & Hks')]".
       iApply (wpcc_bind _ [_]).
       iApply (queue_add_spec with "Hq").
       iIntros "!> Hq". wpcc_pures.
       iApply "Hnext".
-      iEval (rewrite (inv_unfold return' q)).
+      iEval (rw (inv_unfold return' q)).
       iFrame. iApply big_sepL_mono; last done.
       by iIntros "% % _ ? !>".
     }  

@@ -14,7 +14,7 @@ clean: Makefile.rocq
 
 # Create Coq Makefile.
 Makefile.rocq: _CoqProject Makefile
-	rocq makefile -f _CoqProject -o Makefile.rocq
+	rocq makefile --no-rocq-package-warning -f _CoqProject -o Makefile.rocq
 
 # Install build-dependencies
 build-dep/opam: opam Makefile

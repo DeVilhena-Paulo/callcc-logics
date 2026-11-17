@@ -63,7 +63,7 @@ Section queue_lib.
       is_queue := is_queue';
     |}.
     Next Obligation.
-      iIntros "% % HQ". rewrite /queue_create'.
+      iIntros "% % HQ". rw /queue_create'.
       wpcc_pures. iApply wpcc_alloc.
       iIntros "!> %r Hr _". iApply wpcc_value.
       iApply "HQ". iExists r, list_nil. iFrame.
@@ -71,7 +71,7 @@ Section queue_lib.
     Qed.
     Next Obligation.
       iIntros "% % % % % Hq HQ".
-      rewrite /queue_add'. wpcc_pures.
+      rw /queue_add'. wpcc_pures.
       iDestruct "Hq" as "(% & % & -> & Hr & Hl)".
       iApply (wpcc_load with "Hr").
       iIntros "!> Hr".
@@ -84,13 +84,13 @@ Section queue_lib.
     Qed.
     Next Obligation.
       iIntros "% % % % % Hq HQ".
-      rewrite /queue_take'. wpcc_pures.
+      rw /queue_take'. wpcc_pures.
       iDestruct "Hq" as "(% & % & -> & Hr & Hl)".
       iApply (wpcc_load with "Hr").
       iIntros "!> Hr".
       iApply (wpcc_bind _ [CaseCtx _ _]).
       iApply (list_reverse_spec with "Hl").
-      iIntros "!> %l' Hl'". simpl. rewrite reverse_app //=.
+      iIntros "!> %l' Hl'". simpl. rw reverse_app //=.
       iDestruct "Hl'" as "[%l'' [-> Hl'']]". wpcc_pures.
       iApply (wpcc_bind _ [AppRCtx _; StoreRCtx _]).
       iApply (list_reverse_spec with "Hl''").
@@ -98,11 +98,11 @@ Section queue_lib.
       iApply (wpcc_store with "Hr").
       iIntros "!> Hr". wpcc_pures.
       iApply "HQ". iExists r, l'.
-      rewrite reverse_involutive. by iFrame.
+      rw reverse_involutive. by iFrame.
     Qed.
     Next Obligation.
       iIntros "% % % % Hq HQ".
-      rewrite /queue_empty'. wpcc_pures.
+      rw /queue_empty'. wpcc_pures.
       iDestruct "Hq" as "(% & % & -> & Hr & #Hl)".
       iApply (wpcc_load with "Hr").
       iIntros "!> Hr".

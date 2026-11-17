@@ -41,7 +41,7 @@ Section weakestpre.
   (* Non-expansiveness. *)
 
   Global Instance wpcc_ne gp f E e : NonExpansive (wpcc gp f E e).
-  Proof. rewrite /wpcc => n Q Q' Hne. by repeat f_equiv. Qed.
+  Proof. rw /wpcc => n Q Q' Hne. by repeat f_equiv. Qed.
 
 End weakestpre.
 
@@ -75,43 +75,43 @@ Definition gpTrue : val → Prop := λ _, True.
 (* Explicit global postcondition [gp]. *)
 Notation "'wp/cc' ⟨ gp ⟩ e  @  f ;  E  {{ R } }" :=
   (wpcc gp f E e%E R%I)
-  (at level 20, gp, f, E, e, R at next level, only parsing) : bi_scope.
+  (at level 0, gp, f, E, e, R at level 200, only parsing) : bi_scope.
 Notation "'wp/cc' ⟨ gp ⟩ e  @  f ;  E  {{ y , Q } }" :=
   (wpcc gp f E e%E (λ y, Q)%I)
-  (at level 20, gp, f, E, e, Q at next level,
+  (at level 0, gp, f, E, e, Q at level 200, y at level 200,
   format "'[hv' 'wp/cc' ⟨ gp ⟩  e  '/' @  f ;  E  '/' {{  '[' y  ,  '/' Q  ']' } } ']'") : bi_scope.
 
 Notation "'wp/cc' ⟨ gp ⟩ e  @  f   {{ R } }" :=
   (wpcc gp f ⊤ e%E R%I)
-  (at level 20, gp, f, e, R at next level, only parsing) : bi_scope.
+  (at level 0, gp, f, e, R at level 200, only parsing) : bi_scope.
 Notation "'wp/cc' ⟨ gp ⟩ e  @  f   {{ y , Q } }" :=
   (wpcc gp f ⊤ e (λ y, Q)%I)
-  (at level 20, gp, f, e, Q at next level,
+  (at level 0, gp, f, e, Q at level 200, y at level 200,
   format "'[hv' 'wp/cc' ⟨ gp ⟩  e  '/' @  f '/'  {{  '[' y  ,  '/' Q  ']' } } ']'") : bi_scope.
 
 (* Default notation: the global postcondition is [gpTrue] (i.e. [λ _, True]).
    Declared last so that it is preferred by the pretty-printer. *)
 Notation "'wp/cc' e  @  f ;  E  {{ R } }" :=
   (wpcc gpTrue f E e%E R%I)
-  (at level 20, f, E, e, R at next level, only parsing) : bi_scope.
+  (at level 0, f, E, e, R at level 200, only parsing) : bi_scope.
 Notation "'wp/cc' e  @  f ;  E  {{ y , Q } }" :=
   (wpcc gpTrue f E e%E (λ y, Q)%I)
-  (at level 20, f, E, e, Q at next level,
+  (at level 0, f, E, e, Q at level 200, y at level 200,
   format "'[hv' 'wp/cc'  e  '/' @  f ;  E  '/' {{  '[' y  ,  '/' Q  ']' } } ']'") : bi_scope.
 
 Notation "'wp/cc' e  @  f   {{ R } }" :=
   (wpcc gpTrue f ⊤ e%E R%I)
-  (at level 20, f, e, R at next level, only parsing) : bi_scope.
+  (at level 0, f, e, R at level 200, only parsing) : bi_scope.
 Notation "'wp/cc' e  @  f   {{ y , Q } }" :=
   (wpcc gpTrue f ⊤ e (λ y, Q)%I)
-  (at level 20, f, e, Q at next level,
+  (at level 0, f, e, Q at level 200, y at level 200,
   format "'[hv' 'wp/cc'  e  '/' @  f '/'  {{  '[' y  ,  '/' Q  ']' } } ']'") : bi_scope.
 
 Notation "{{ P } } e  @  f  ;  m  ;  E {{ Φ } }" := (triplecc gpTrue m f P%I E e%E Φ%I)
   (at level 20, P, e, Φ at level 200,
    format "{{  P  } }  e  @   f  ;  m  ;  E  {{  Φ  } }") : stdpp_scope.
 Notation "{{ P } } e  @  f  ;  m  ;  E {{ v , Q } }" := (triplecc gpTrue m f P%I E e%E (λ v, Q)%I)
-  (at level 20, P, e, Q at level 200,
+  (at level 20, P, e, Q at level 200, v at level 200,
    format "{{  P  } }  e  @  f  ;  m  ;  E  {{  v ,  Q  } }") : stdpp_scope.
 
 
@@ -189,9 +189,9 @@ Section reasoning_rules.
     wp/cc ⟨gp⟩ e @ f {{ v, wp/cc ⟨gp⟩ (fill k v) @ f {{ Φ }} }} -∗
     wp/cc ⟨gp⟩ (fill k e) @ f {{ Φ }}.
   Proof.
-    iIntros "He %k' %R HR #Hk'". rewrite -fill_app.
+    iIntros "He %k' %R HR #Hk'". rw -fill_app.
     iApply ("He" with "HR").
-    iIntros "!> % [Hv HR]". iApply fupd_wp. rewrite fill_app.
+    iIntros "!> % [Hv HR]". iApply fupd_wp. rw fill_app.
     by iApply ("Hv" with "HR").
   Qed.
 
@@ -268,7 +268,7 @@ Section reasoning_rules.
   Proof.
     iIntros "Hwpcc".
     iApply wpcc_call1cc0.
-    iIntros "!> %k Hk". rewrite //= decide_True; last done.
+    iIntros "!> %k Hk". rw //= decide_True; last done.
     iApply (wpcc_bind _ [AppRCtx k]). simpl.
     iApply (wpcc_mono with "[Hwpcc Hk]").
     { by iApply "Hwpcc". }
@@ -339,11 +339,11 @@ Section reasoning_rules.
     wp/cc ⟨gp⟩ fill k (AllocN #n v) @ f {{ R }}.
   Proof.
     iIntros "%Hgt_0 Hwpcc %k' % HP #Hk".
-    iEval (rewrite -fill_app).
+    iEval (rw -fill_app).
     iApply wp_allocN; first done.
     iIntros "!> !> %l Hpoints_to".
     iSpecialize ("Hwpcc" with "Hpoints_to").
-    rewrite fill_app.
+    rw fill_app.
     iApply fupd_wp.
     by iApply ("Hwpcc" with "HP Hk").
   Qed.
@@ -353,7 +353,7 @@ Section reasoning_rules.
     wp/cc ⟨gp⟩ fill k (ref v) @ f {{ R }}.
   Proof.
     iIntros "Hwpcc". iApply wpcc_allocN; first lia.
-    iIntros "!> /=" (l) "[[Hl Hm] _]". rewrite Loc.add_0.
+    iIntros "!> /=" (l) "[[Hl Hm] _]". rw Loc.add_0.
     iApply ("Hwpcc" with "Hl Hm").
   Qed.
 
@@ -363,9 +363,9 @@ Section reasoning_rules.
     wp/cc ⟨gp⟩ fill k (! #l) @ f {{ R }}.
   Proof.
     iIntros "Hl Hwpcc %k' %P HP #Hk".
-    iEval (rewrite -fill_app).
+    iEval (rw -fill_app).
     iApply (wp_load with "Hl").
-    iIntros "!> !> Hl". rewrite fill_app.
+    iIntros "!> !> Hl". rw fill_app.
     iApply fupd_wp.
     iApply ("Hwpcc" with "Hl HP Hk").
   Qed.
@@ -376,9 +376,9 @@ Section reasoning_rules.
     wp/cc ⟨gp⟩ fill k (#l <- w) @ f {{ R }}.
   Proof.
     iIntros "Hl Hwpcc %k' %P HP #Hk".
-    iEval (rewrite -fill_app).
+    iEval (rw -fill_app).
     iApply (wp_store with "Hl").
-    iIntros "!> !> Hl". rewrite fill_app.
+    iIntros "!> !> Hl". rw fill_app.
     iApply fupd_wp.
     iApply ("Hwpcc" with "Hl HP Hk").
   Qed.
@@ -389,9 +389,9 @@ Section reasoning_rules.
     wp/cc ⟨gp⟩ fill k (Free #l) @ f {{ R }}.
   Proof.
     iIntros "Hl Hwpcc %k' %P HP #Hk".
-    iEval (rewrite -fill_app).
+    iEval (rw -fill_app).
     iApply (wp_free with "Hl"). iIntros "!> !>".
-    rewrite fill_app.
+    rw fill_app.
     iApply fupd_wp.
     iApply ("Hwpcc" with "HP Hk").
   Qed.
@@ -408,11 +408,11 @@ Section reasoning_rules.
     wp/cc ⟨gp⟩ fill k (Fork e) @ f {{ Φ }}.
   Proof.
     iIntros "He HΦ %k' %P HP #Hk !>".
-    iEval (rewrite -fill_app).
+    iEval (rw -fill_app).
     iApply (wp_fork with "[He]").
     { by iApply (wpcc_sound gpTrue). }
     iModIntro. iApply fupd_wp.
-    iEval (rewrite fill_app).
+    iEval (rw fill_app).
     by iApply ("HΦ" with "HP Hk").
   Qed.
 
@@ -422,10 +422,10 @@ Section reasoning_rules.
     wp/cc ⟨gp⟩ fill k1 (FAA #l1 #m1) @ f {{ R }}.
   Proof.
     iIntros "Hl1 Hwpcc %k' %P HP #Hk !>".
-    iEval (rewrite -fill_app).
+    iEval (rw -fill_app).
     iApply (wp_faa with "Hl1").
     iIntros "!> Hl1".
-    rewrite !fill_app.
+    rw !fill_app.
     iApply fupd_wp. iApply ("Hwpcc" with "Hl1 HP Hk").
   Qed.
 
@@ -435,9 +435,9 @@ Section reasoning_rules.
     wp/cc ⟨gp⟩ fill k1 (Xchg #l1 w1) @ f {{ R }}.
   Proof.
     iIntros "Hl1 Hwpcc %k' %P HP #Hk !>".
-    iEval (rewrite -fill_app).
+    iEval (rw -fill_app).
     iApply (wp_xchg with "Hl1").
-    iIntros "!> Hl1". rewrite fill_app.
+    iIntros "!> Hl1". rw fill_app.
     iApply fupd_wp.
     iApply ("Hwpcc" with "Hl1 HP Hk").
   Qed.
@@ -450,10 +450,10 @@ Section reasoning_rules.
     wp/cc ⟨gp⟩ fill k1 (CmpXchg #l1 u1 v1) @ f {{R}}.
   Proof.
     iIntros "%Hneq %Hsafe Hl1 Hwpcc %k' %P HP #Hk".
-    iEval (rewrite -fill_app).
+    iEval (rw -fill_app).
     iApply (wp_cmpxchg_fail with "Hl1"); try done.
     iIntros "!> !> Hl1".
-    rewrite fill_app.
+    rw fill_app.
     iApply fupd_wp. iApply ("Hwpcc" with "Hl1 HP Hk").
   Qed.
 
@@ -464,10 +464,10 @@ Section reasoning_rules.
     wp/cc ⟨gp⟩ fill k (CmpXchg #l u v) @ f {{ R }}.
   Proof.
     iIntros "%Hsafe Hl1 Hwpcc %k' %P HP #Hk".
-    iEval (rewrite -fill_app).
+    iEval (rw -fill_app).
     iApply (wp_cmpxchg_suc with "Hl1"); try done. { by left. }
     iIntros "!> !> Hl1".
-    rewrite !fill_app.
+    rw !fill_app.
     iApply fupd_wp. iApply ("Hwpcc" with "Hl1 HP Hk").
   Qed.
 
@@ -521,11 +521,11 @@ Section reasoning_rules.
     ⊢ WP fill k e @ NotStuck; E {{ Φ }}.
   Proof.
     iIntros "Hwp".
-    rewrite wp_unfold /wp_pre.
+    rw wp_unfold /wp_pre.
     destruct (to_val e) as [v|] eqn:He.
     { apply of_to_val in He as ->. simpl. by iApply fupd_wp. }
-    rewrite wp_unfold /wp_pre. simpl.
-    rewrite fill_not_val He //=.
+    rw wp_unfold /wp_pre. simpl.
+    rw fill_not_val He //=.
     iIntros (σ1 step κs n) "Hσ".
     iSpecialize ("Hwp" $! σ1 step κs n with "Hσ").
     iMod "Hwp" as "[%Hreducible Hwp]".
@@ -544,7 +544,7 @@ Section reasoning_rules.
     iMod ("Hwp" with "Hcred") as "Hwp". iIntros "!>!>".
     iMod "Hwp". iModIntro. iApply (step_fupdN_wand with "Hwp"). iIntros "Hwp".
     iMod "Hwp" as "($ & H & $)". iModIntro.
-    rewrite wp_unfold /wp_pre.
+    rw wp_unfold /wp_pre.
     destruct He2' as [v2' Hv2']. simpl.
     apply of_to_val in Hv2' as ->. simpl.
     by iApply fupd_wp.
@@ -555,14 +555,14 @@ Section reasoning_rules.
     wp/cc ⟨gp⟩ fill k e @ f {{ R }}.
   Proof.
     iIntros "He %k' %P HP #Hk". iModIntro.
-    rewrite -!fill_app.
+    rw -!fill_app.
     iApply wp_atomic_bind.
     iApply wp_atomic; auto.
     { simpl. by apply strongly_atomic_atomic, atomic_ectx_atomic. }
     iMod "He". iModIntro.
     iApply (wp_wand with "He").
     iIntros (v) "He".
-    rewrite !fill_app.
+    rw !fill_app.
     by iSpecialize ("He" with "HP Hk").
   Qed.
 
@@ -709,18 +709,18 @@ Section reasoning_rules_with_triples.
   Lemma triplecc_return f (m : mode) (v : val) P Φ :
     □?m (P -∗ Φ v) -∗ {{ P }} v @ f ; m ; ⊤ {{ Φ }}.
   Proof.
-    rewrite /triplecc; destruct m; simpl.
+    rw /triplecc; destruct m; simpl.
     - iIntros "#HΦ !> HP". iApply wpcc_value. by iApply "HΦ".
     - iIntros "HΦ HP". iApply wpcc_value. by iApply "HΦ".
   Qed.
 
   Lemma triplecc_bind f (m : mode) (e : expr) (k : ectx) P Φ Φ' :
     {{ P }} e @ f ; m ; ⊤ {{ Φ }} -∗
-    (∀ v, {{ Φ v }} fill k v @ f ; (if f then Many else m) ; ⊤ {{ Φ' }}) -∗
+    (∀ v, {{ Φ v }} fill k v @ f ; (if f is NoFrame then Many else m) ; ⊤ {{ Φ' }}) -∗
     {{ P }} fill k e @ f ; m ; ⊤ {{ Φ' }}.
   Proof.
-    rewrite /triplecc; destruct m; simpl.
-    - rewrite (_ : (if f then Many else Many) = Many); [|by destruct f]. simpl.
+    rw /triplecc; destruct m; simpl.
+    - rw (_ : (if f is NoFrame then Many else Many) = Many); [|by destruct f]. simpl.
       iIntros "#He #Hk !> HP". iApply wpcc_bind.
       iApply (wpcc_mono with "[HP]").
       { by iApply "He". }
@@ -740,14 +740,14 @@ Section reasoning_rules_with_triples.
     {{ P }} fill k e @ f ; Many ; ⊤ {{ Φ' }}.
   Proof.
     iIntros "#He #Hk". iApply (triplecc_bind _ Many with "He").
-    by rewrite (_ : (if f then Many else Many) = Many); [|by destruct f].
+    by rw (_ : (if f is NoFrame then Many else Many) = Many); [|by destruct f].
   Qed.
 
   Lemma triplecc_callcc (m : mode) (x : string) (e : expr) P Φ :
     (∀ k, {{ P ∗ isKont k Φ }} (subst x k e)%E @ NoFrame ; m ; ⊤ {{ Φ }}) -∗
     {{ P }} (call/cc: x, e)%E @ NoFrame ; m ; ⊤ {{ Φ }}.
   Proof.
-    rewrite /triplecc; destruct m; simpl.
+    rw /triplecc; destruct m; simpl.
     - iIntros "#He !> HP". iApply wpcc_callcc.
       iIntros "!> %k #Hk". iApply "He". by iFrame.
     - iIntros "He HP". iApply wpcc_callcc.
@@ -758,7 +758,7 @@ Section reasoning_rules_with_triples.
     (∀ k, {{ P ∗ isCont k Φ }} (subst x k e)%E @ WithFrame ; m ; ⊤ {{ _, False }}) -∗
     {{ P }} (call/cc: x, e)%E @ WithFrame ; m ; ⊤ {{ Φ }}.
   Proof.
-    rewrite /triplecc; destruct m; simpl.
+    rw /triplecc; destruct m; simpl.
     - iIntros "#He !> HP". iApply wpcc_callcc_alt.
       iIntros "!> %k Hk". iApply "He". by iFrame.
     - iIntros "He HP". iApply wpcc_callcc_alt.
@@ -769,7 +769,7 @@ Section reasoning_rules_with_triples.
     (∀ k, {{ P ∗ isCont k Φ }} (subst x k e)%E @ WithFrame ; m ; ⊤ {{ _, False }}) -∗
     {{ P }} (call/1cc0: x, e)%E @ WithFrame ; m ; ⊤ {{ Φ }}.
   Proof.
-    rewrite /triplecc; destruct m; simpl.
+    rw /triplecc; destruct m; simpl.
     - iIntros "#He !> HP". iApply wpcc_call1cc0.
       iIntros "!> %k Hk". iApply "He". by iFrame.
     - iIntros "He HP". iApply wpcc_call1cc0.
@@ -779,14 +779,14 @@ Section reasoning_rules_with_triples.
   Lemma triplecc_kont f (m : mode) (k v : val) Φ :
     ⊢ {{ isKont k Φ ∗ Φ v }} (k v)%E @ f ; m ; ⊤ {{ _, False }}.
   Proof.
-    rewrite /triplecc; destruct m; simpl; [iModIntro|];
+    rw /triplecc; destruct m; simpl; [iModIntro|];
     iIntros "[#Hk Hv]"; by iApply (wpcc_kont with "Hk Hv").
   Qed.
 
   Lemma triplecc_cont f (m : mode) (k v : val) Φ :
     ⊢ {{ isCont k Φ ∗ Φ v }} (k v)%E @ f ; m ; ⊤ {{ _, False }}.
   Proof.
-    rewrite /triplecc; destruct m; simpl; [iModIntro|];
+    rw /triplecc; destruct m; simpl; [iModIntro|];
     iIntros "[Hk Hv]"; by iApply (wpcc_cont with "Hk Hv").
   Qed.
 
@@ -794,7 +794,7 @@ Section reasoning_rules_with_triples.
     {{ P }} e @ WithFrame ; m ; ⊤ {{ Φ }} -∗
     {{ P ∗ R }} e @ WithFrame ; m ; ⊤ {{ y, Φ y ∗ R }}.
   Proof.
-    rewrite /triplecc; destruct m; simpl;
+    rw /triplecc; destruct m; simpl;
     [iIntros "#Hk !> [HP HR]"|iIntros "Hk [HP HR]"];
     iApply (wpcc_frame with "[HP Hk] HR"); by iApply "Hk".
   Qed.
@@ -803,7 +803,7 @@ Section reasoning_rules_with_triples.
     {{ P }} e @ WithFrame ; m ; ⊤ {{ Φ }} -∗
     {{ P }} e @ f ; m ; ⊤ {{ Φ }}.
   Proof.
-    rewrite /triplecc; destruct f; simpl; [|by iIntros "?"].
+    rw /triplecc; destruct f; simpl; [|by iIntros "?"].
     destruct m; simpl; [iIntros "#He !> HP"|iIntros "He HP"];
     iApply wpcc_with_frame; by iApply "He".
   Qed.
@@ -812,7 +812,7 @@ Section reasoning_rules_with_triples.
     (∀ R, {{ P ∗ R }} e @ NoFrame ; m ; ⊤ {{ y, Φ y ∗ R }}) -∗
     {{ P }} e @ f ; m ; ⊤ {{ Φ }}.
   Proof.
-    rewrite /triplecc; destruct f; simpl;
+    rw /triplecc; destruct f; simpl;
     destruct m; simpl;
     try (iIntros "#He !>"); try iIntros "He";
     iIntros "HP"; iApply wpcc_no_frame;
@@ -822,11 +822,11 @@ Section reasoning_rules_with_triples.
   Lemma triplecc_consequence f (m : mode) (e : expr) P P' Φ Φ' :
     □?m (P' -∗ P) -∗
     {{ P }} e @ f ; m ; ⊤ {{ Φ }} -∗
-    □?(if f then Many else m) (∀ y, Φ y -∗ Φ' y) -∗
+    □?(if f is NoFrame then Many else m) (∀ y, Φ y -∗ Φ' y) -∗
     {{ P' }} e @ f ; m ; ⊤ {{ Φ' }}.
   Proof.
-    rewrite /triplecc; destruct m; simpl.
-    - rewrite (_ : (if f then true else true) = true); [|by destruct f]. simpl.
+    rw /triplecc; destruct m; simpl.
+    - rw (_ : (if f is NoFrame then true else true) = true); [|by destruct f]. simpl.
       iIntros "#HP #He #HΦ' !> HP'".
       iApply (wpcc_mono with "[HP He HP']").
       { iApply "He"; by iApply "HP". }
@@ -848,7 +848,7 @@ Section reasoning_rules_with_triples.
   Proof.
     iIntros "#HP #He #HΦ'".
     iApply (triplecc_consequence f Many with "[] He"); try by simpl.
-    rewrite (_ : (if f then true else true) = true); [|by destruct f].
+    rw (_ : (if f is NoFrame then true else true) = true); [|by destruct f].
     by simpl.
   Qed.    
 

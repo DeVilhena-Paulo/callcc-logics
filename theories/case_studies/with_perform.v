@@ -92,7 +92,7 @@ Section reduction_rules.
     base_step (K ++ k) r {| heap := h |} K2 e2 σ2 [] →
     cstep (fill K e, {| heap := h |}) (fill K2 e2, σ2).
   Proof.
-    intros Hr Hstep. rewrite (get_redex_spec _ _ _ Hr) -fill_app.
+    intros Hr Hstep. rw (get_redex_spec _ _ _ Hr) -fill_app.
     by apply Ectx_prim_step_2.
   Qed.
 
@@ -101,7 +101,7 @@ Section reduction_rules.
 
   Lemma csteps_fill_app K k e σ c :
     (fill K (fill k e), σ) -->* c → (fill (K ++ k) e, σ) -->* c.
-  Proof. by rewrite fill_app. Qed.
+  Proof. by rw fill_app. Qed.
 
   Lemma csteps_refl e e' h h' : e = e' → h = h' → (e, {| heap := h |}) -->* (e', {| heap := h' |}).
   Proof. by intros -> ->. Qed.
@@ -110,7 +110,7 @@ Section reduction_rules.
 
   (* Perform one step of [base_step] at the redex of the current expression. *)
   Local Ltac cstep_with tac :=
-    rewrite /handle /Throw;
+    rw /handle /Throw;
     lazymatch goal with
     | |- (fill ?K ?e, {| heap := ?h |}) -->* _ =>
         let p := eval cbv [get_redex] in (get_redex e) in
@@ -128,7 +128,7 @@ Section reduction_rules.
     try lazymatch goal with
     | |- (fill (_ ++ _) _, _) -->* _ => apply csteps_fill_app
     end;
-    rewrite ?state_init_heap_singleton ?app_nil_r;
+    rw ?state_init_heap_singleton ?app_nil_r;
     lazymatch goal with
     | |- (?e, ?σ) -->* ?c =>
         let e' := eval simpl in e in
@@ -155,7 +155,7 @@ Section reduction_rules.
     cstep_with ltac:(fun _ =>
       apply (AllocNStep _ _ _ l); [lia|];
       intros i ??; assert (i = 0%Z) as -> by lia;
-      rewrite Loc.add_0; solve_lookup); cnorm.
+      rw Loc.add_0; solve_lookup); cnorm.
 
   (* ----------------------------------------------------------------------- *)
   (* Rules. *)
@@ -172,7 +172,7 @@ Section reduction_rules.
        state_upd_heap (<[l := Some #()]>) σ)
     ).
   Proof.
-    rewrite /R /H /M /state_upd_heap. destruct σ. simpl.
+    rw /R /H /M /state_upd_heap. destruct σ. simpl.
     intros Hr Hl. assert (r ≠ l) by congruence. assert (l ≠ r) by congruence.
     csteps. cstep_call1cc0 l. csteps.
     apply csteps_refl; exact eq_refl.
@@ -191,11 +191,11 @@ Section reduction_rules.
        state_upd_heap (<[l := Some #()]>) σ)
     ).
   Proof.
-    rewrite /R /P /H /M /state_upd_heap. destruct σ. simpl.
+    rw /R /P /H /M /state_upd_heap. destruct σ. simpl.
     intros Hr Hl ?. assert (l ≠ r) by done.
     csteps. cstep_alloc r. csteps. cstep_call1cc0 l. csteps.
     apply csteps_refl; [exact eq_refl|].
-    by rewrite (insert_insert_ne _ l r) // insert_insert_eq.
+    by rw (insert_insert_ne _ l r) // insert_insert_eq.
   Qed.
 
   (* R r v / σ[r := H r effc retc l K, l := ()] -->* K[retc v] / σ[l := ⊥] *)
@@ -205,7 +205,7 @@ Section reduction_rules.
 
     (R r v, σ) -->* (fill K (retc v), state_upd_heap <[l := None]> σ).
   Proof.
-    rewrite /R /H /M /state_upd_heap. destruct σ. simpl.
+    rw /R /H /M /state_upd_heap. destruct σ. simpl.
     intros Hr Hl. csteps.
     apply csteps_refl; exact eq_refl.
   Qed.
@@ -223,7 +223,7 @@ Section reduction_rules.
        state_upd_heap <[l' := Some #()]> σ)
     ).
   Proof.
-    rewrite /P /C /H /M /state_upd_heap. destruct σ. simpl.
+    rw /P /C /H /M /state_upd_heap. destruct σ. simpl.
     intros Hr Hl Hl'.
     assert (r ≠ l') by congruence. assert (l' ≠ r) by congruence.
     assert (l ≠ l') by congruence. assert (l' ≠ l) by congruence.
@@ -246,7 +246,7 @@ Section reduction_rules.
        state_upd_heap <[l := Some #()]> σ))
     ).
   Proof.
-    rewrite /C /H /M /state_upd_heap. destruct σ. simpl.
+    rw /C /H /M /state_upd_heap. destruct σ. simpl.
     intros Hr Hl' Hl ?. assert (l' ≠ r) by done.
     assert (r ≠ l) by congruence. assert (l ≠ r) by congruence.
     assert (l ≠ l') by congruence. assert (l' ≠ l) by congruence.
@@ -266,7 +266,7 @@ Section isHandler_predicate.
   (* ----------------------------------------------------------------------- *)
   (* Definition. *)
 
-  Notation isHandler_type := (
+  Abbreviation isHandler_type := (
      (val -d> (val -d> iPropO Σ) -d> iPropO Σ) -d>
      (val -d> iPropO Σ) -d>
      val -d> val -d>
@@ -291,7 +291,7 @@ Section isHandler_predicate.
 
   Local Instance isHandler_pre_contractive : Contractive isHandler_pre.
   Proof.
-    rewrite /isHandler_pre /triplecc => n deep deep' Hne Ψ Q h r Q'.
+    rw /isHandler_pre /triplecc => n deep deep' Hne Ψ Q h r Q'.
     repeat (f_contractive || f_equiv). apply Hne.
   Qed.
   Definition isHandler_def := fixpoint isHandler_pre.
@@ -304,7 +304,7 @@ Section isHandler_predicate.
   Global Lemma isHandler_unfold Ψ Q h r Q' :
     isHandler Ψ Q h r Q' ⊣⊢ isHandler_pre isHandler Ψ Q h r Q'.
   Proof.
-    rewrite isHandler_eq /isHandler_def.
+    rw isHandler_eq /isHandler_def.
     by apply (fixpoint_unfold isHandler_pre).
   Qed.
 
@@ -333,7 +333,7 @@ Section verification.
 
   Local Instance mainPost_pre_contractive : Contractive mainPost_pre.
   Proof.
-    rewrite /mainPost_pre /isCont /isCont_gen => n mainPost mainPost' Hne ret Q Ψ res.
+    rw /mainPost_pre /isCont /isCont_gen => n mainPost mainPost' Hne ret Q Ψ res.
     repeat (f_contractive || f_equiv). by apply Hne.
   Qed.
   Definition mainPost_def := fixpoint mainPost_pre.
@@ -345,7 +345,7 @@ Section verification.
   Global Lemma mainPost_unfold ret Q Ψ res :
     mainPost ret Q Ψ res ⊣⊢ mainPost_pre mainPost ret Q Ψ res.
   Proof.
-    rewrite mainPost_eq /mainPost_def.
+    rw mainPost_eq /mainPost_def.
     by apply (fixpoint_unfold mainPost_pre).
   Qed.
 
@@ -364,7 +364,7 @@ Section verification.
     wp/cc with_perform effc retc main @ WithFrame {{Q'}}.
   Proof.
     iIntros "Hhandler Hmain".
-    rewrite /with_perform. wpcc_pures.
+    rw /with_perform. wpcc_pures.
     iApply wpcc_alloc.
     iIntros "!> %ret Hret _". wpcc_pures.
     iApply (wpcc_bind _ [_]).
@@ -382,28 +382,28 @@ Section verification.
         iApply wpcc_call1cc0.
         iIntros "!> %k Hk". simpl.
         iApply (wpcc_load with "Hret"). iIntros "!> Hret".
-        rewrite /option_get. wpcc_pures.
+        rw /option_get. wpcc_pures.
         iApply (wpcc_cont with "Hk'").
-        rewrite mainPost_unfold.
+        rw mainPost_unfold.
         iSplitL "Hret"; [iFrame|]. iRight.
         iExists x, k, Φ. iSplit; [done|]. iSplitL "HΨ"; [done|].
         by iNext.
       + simpl. iIntros "%y [[%k' [Hret Hk']] Hy] !>". wpcc_pures.
         iApply (wpcc_load with "Hret"). iIntros "!> Hret".
-        rewrite /option_get. wpcc_pures.
+        rw /option_get. wpcc_pures.
         iApply (wpcc_cont with "Hk'").
-        rewrite mainPost_unfold.
+        rw mainPost_unfold.
         iSplitL "Hret"; [iFrame|]. iLeft.
         iExists y. by iFrame.
 
     - iLöb as "IH" forall (Q').
-      simpl. iIntros (res). rewrite mainPost_unfold.
+      simpl. iIntros (res). rw mainPost_unfold.
       iIntros "[[%v Hret] [(%y & -> & Hy)|Hy]] !>".
-      + wpcc_pures. rewrite isHandler_unfold.
+      + wpcc_pures. rw isHandler_unfold.
         iDestruct "Hhandler" as "[Hr _]".
         unfold triplecc. simpl. by iApply "Hr".
       + iDestruct "Hy" as "(%x & %k & %Φ & -> & HΨ & Hk)".
-        wpcc_pures. rewrite isHandler_unfold.
+        wpcc_pures. rw isHandler_unfold.
         iDestruct "Hhandler" as "[_ Hh]".
         unfold triplecc. simpl.
         iApply ("Hh" with "[HΨ Hret Hk]"). iFrame.
@@ -481,8 +481,8 @@ Section control_inversion.
     Proof.
       unfold frac_pointsto.
       have Hequiv: (1%Qp, to_agree us) ≡ ((1 / 2)%Qp ⋅ (1 / 2)%Qp, to_agree us ⋅ to_agree us).
-      { by rewrite frac_op Qp.half_half agree_idemp. }
-      by rewrite Hequiv pair_op own_op.
+      { by rw frac_op Qp.half_half agree_idemp. }
+      by rw Hequiv pair_op own_op.
     Qed.
 
     Lemma confront_views seen us vs :
@@ -491,7 +491,7 @@ Section control_inversion.
       iIntros "Hseen1 Hseen2".
       iDestruct (own_valid_2 with "Hseen1 Hseen2") as %Hvalid.
       iPureIntro.
-      rewrite -pair_op pair_valid in Hvalid.
+      rw -pair_op pair_valid in Hvalid.
       destruct Hvalid as [_ Hagree_valid].
       specialize (agree_op_inv _ _ Hagree_valid) as Hequiv.
       specialize (to_agree_inj _ _ Hequiv).
@@ -555,47 +555,47 @@ Section control_inversion.
     Proof.
       iLöb as "IH".
       iIntros (us vs) "<- Hseen1".
-      rewrite !isHandler_unfold /isHandler_eq. iSplit;
-      try by iIntros (??) "?"; rewrite upcl_bottom.
+      rw !isHandler_unfold /isHandler_eq. iSplit;
+      try by iIntros (??) "?"; rw upcl_bottom.
       (* return branch. *)
-      - rewrite /triplecc //=. iIntros (y) "Hseen2".
+      - rw /triplecc //=. iIntros (y) "Hseen2".
         iDestruct (confront_views with "Hseen1 Hseen2") as %Heq.
         destruct vs; cycle 1.
-        { exfalso. specialize (f_equal length Heq). rewrite length_app //=. lia. }
-        rewrite app_nil_r.
+        { exfalso. specialize (f_equal length Heq). rw length_app //=. lia. }
+        rw app_nil_r.
         by wpcc_pures.
       (* effect branch. *)
-      - rewrite /triplecc.
-        iIntros (u k Φ). rewrite silly.
+      - rw /triplecc.
+        iIntros (u k Φ). rw silly.
         iIntros "[Hu Hk]".
         iDestruct "Hu" as (us' vs') "[[Hseen2 %Hxs]  HΦ]".
         iDestruct (confront_views with "Hseen1 Hseen2") as %<-.
         iCombine "Hseen1 Hseen2" as "Hseen".
         iApply fupd_wpcc.
         iMod (update_cell _ _ (us ++ [u]) with "Hseen") as "Hseen".
-        rewrite split_cell.
+        rw split_cell.
         iDestruct "Hseen" as "[Hseen1 Hseen2]".
         iModIntro.
-        wpcc_pures. rewrite /isHead /isHead_pre.
+        wpcc_pures. rw /isHead /isHead_pre.
         destruct vs.
-        { exfalso. specialize (f_equal length Hxs). rewrite !length_app //=. lia. }
+        { exfalso. specialize (f_equal length Hxs). rw !length_app //=. lia. }
         destruct (app_inj_1 us us _ _ eq_refl Hxs) as [_ Heq].
         injection Heq as -> ->.
         iExists k. iModIntro. iSplit; [done|].
         iNext.
-        rewrite !isSeq_unfold /isSeq_pre //=.
+        rw !isSeq_unfold /isSeq_pre //=.
         iApply "Hk". iSpecialize ("HΦ" with "Hseen1"). iFrame.
         iApply ("IH" with "[] Hseen2").
-        by rewrite -app_assoc.
+        by rw -app_assoc.
     Qed.
 
     Lemma invert_spec iter xs :
-      ⊢ {{ isIter iter xs }} invert iter @ WithFrame; Many; ⊤ {{ k, isSeq k [] xs }}%I.
+      ⊢ ({{ isIter iter xs }} invert iter @ WithFrame; Many; ⊤ {{ k, isSeq k [] xs }})%I.
     Proof.
-      rewrite /triplecc /invert //=. iIntros "!> Hiter".
+      rw /triplecc /invert //=. iIntros "!> Hiter".
       wpcc_pures.
       iMod (new_cell ([] : list val)) as (seen) "[Hseen1 Hseen2]".
-      iModIntro. rewrite isSeq_unfold /isSeq_pre.
+      iModIntro. rw isSeq_unfold /isSeq_pre.
       wpcc_pures.
       iApply (wpcc_with_perform _ _ _ (YIELD seen xs) with "[Hseen1]").
       { by iApply (yield_handler_correct with "[] Hseen1"). }
@@ -606,7 +606,7 @@ Section control_inversion.
           iIntros "!> %us %u %vs (HR & Hus & <-)".
           iApply ("Hperform" $! u (λ _, seen -{1 / 2}-> (us ++ [u]) ∗ _) with "HR")%I.
           iExists us, vs. iFrame. iSplit; [done|].
-          iIntros "$". by rewrite -app_assoc.
+          iIntros "$". by rw -app_assoc.
         }
         { simpl. iIntros "% (HR & Hxs & _) !>". by iFrame. }
       }
@@ -646,7 +646,7 @@ Section coroutines.
         InjR "x"
     end%E.
 
-  Notation isCoroV_type := (
+  Abbreviation isCoroV_type := (
     val -d> (val -d> (val -d> iPropO Σ) -d> iPropO Σ) -d> (val -d> iPropO Σ) -d> iPropO Σ -d> iPropO Σ
   ) (only parsing).
 
@@ -665,7 +665,7 @@ Section coroutines.
 
   Local Instance isCoroV_pre_contractive : Contractive isCoroV_pre.
   Proof.
-    rewrite /isCoroV_pre => n isCoroV isCoroV' Hne g Ψ Φ Q.
+    rw /isCoroV_pre => n isCoroV isCoroV' Hne g Ψ Φ Q.
     repeat (f_contractive || f_equiv). intros ?.
     repeat (f_contractive || f_equiv). by apply Hne.
   Qed.
@@ -677,7 +677,7 @@ Section coroutines.
   Global Lemma isCoroV_unfold g Ψ Φ Q :
     isCoroV g Ψ Φ Q ⊣⊢ isCoroV_pre isCoroV g Ψ Φ Q.
   Proof.
-    rewrite isCoroV_eq /isCoroV_def.
+    rw isCoroV_eq /isCoroV_def.
     by apply (fixpoint_unfold isCoroV_pre).
   Qed.
 
@@ -700,14 +700,14 @@ Section coroutines.
     }}.
   Proof.
     iIntros "(%l & %g & (-> & Hl & Hg)) HΦ".
-    rewrite /resume /option_get. wpcc_pures.
+    rw /resume /option_get. wpcc_pures.
     iApply (wpcc_load with "Hl").
     iIntros "!> Hl". wpcc_pures.
     iApply (wpcc_store with "Hl").
     iIntros "!> Hl". wpcc_pures.
     iApply (wpcc_bind _ [CaseCtx _ _]).
     iApply (wpcc_mono with "[Hg HΦ]").
-    { rewrite isCoroV_unfold. by iApply "Hg". }
+    { rw isCoroV_unfold. by iApply "Hg". }
     simpl.
     iIntros "%y Hy !>". destruct y => //; try done.
     - wpcc_pures.
@@ -733,11 +733,11 @@ Section coroutines.
     wp/cc create main @ WithFrame {{ r, isCoro r Ψ (λ _, True) Q }}.
 
   Proof.
-    iIntros "Hmain". rewrite /create.
+    iIntros "Hmain". rw /create.
     wpcc_pures. iApply wpcc_alloc.
     iIntros "!> %l Hl _". wpcc_pures. iModIntro.
     iExists l. iFrame. iSplit; [done|].
-    rewrite isCoroV_unfold.
+    rw isCoroV_unfold.
     iIntros "_". wpcc_pures.
     set Ψ' := (λ x Φ, ∃ Φ', Ψ x Φ' ∗ (Φ' #() -∗ Φ #()))%I.
     iApply (wpcc_with_perform _ _ _ Ψ' (λ _, Q) with "[] [Hmain]"); cycle -1.
@@ -747,11 +747,11 @@ Section coroutines.
       iFrame. by auto.
     }
     iLöb as "IH".
-    rewrite {-1}isHandler_unfold. iSplit.
-    - rewrite /triplecc //=. iIntros "%y HQ". by wpcc_pures.
-    - rewrite /triplecc //=. iIntros "%x %k %Φ [[%Φ' [Hx HΦ]] Hk]".
+    rw {-1}isHandler_unfold. iSplit.
+    - rw /triplecc //=. iIntros "%y HQ". by wpcc_pures.
+    - rw /triplecc //=. iIntros "%x %k %Φ [[%Φ' [Hx HΦ]] Hk]".
       wpcc_pures. iModIntro. iFrame. iNext.
-      rewrite isCoroV_unfold.
+      rw isCoroV_unfold.
       iIntros "HΦ'".
       iApply "Hk". iSplitL; first by iApply "HΦ".
       by iApply "IH".

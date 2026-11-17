@@ -55,9 +55,9 @@ Section list_lib.
     wp/cc list_cons x l @ b {{ Q }}.
   Proof.
     destruct xs as [|x' xs'].
-    - iIntros "H HQ". rewrite /list_cons //=.
+    - iIntros "H HQ". rw /list_cons //=.
       wpcc_pures. iModIntro. iApply "HQ". by eauto.
-    - iIntros "[% Hl] HQ". rewrite /list_cons //=.
+    - iIntros "[% Hl] HQ". rw /list_cons //=.
       wpcc_pures. iModIntro. iApply "HQ". by eauto.
   Qed.
 
@@ -65,7 +65,7 @@ Section list_lib.
     ▷ (∀ l, is_list l [x] -∗ Q l) -∗
     wp/cc list_singleton x @ b {{ Q }}.
   Proof.
-    iIntros "HQ". rewrite /list_singleton //=. wpcc_pures.
+    iIntros "HQ". rw /list_singleton //=. wpcc_pures.
     by iApply list_cons_spec; first by iApply list_nil_spec.
   Qed.
 
@@ -76,10 +76,10 @@ Section list_lib.
     wp/cc list_concat l1 l2 @ b {{ Q }}.
   Proof.
     iInduction xs as [|x xs] "IH" forall (l1 l2 ys Q).
-    - iIntros "Hl1 Hl2 HQ". rewrite /list_concat //=.
+    - iIntros "Hl1 Hl2 HQ". rw /list_concat //=.
       wpcc_pures. iDestruct "Hl1" as "->". wpcc_pures.
       by iApply "HQ".
-    - iIntros "[%l1' Hl1'] Hl2 HQ". rewrite /list_concat //=.
+    - iIntros "[%l1' Hl1'] Hl2 HQ". rw /list_concat //=.
       wpcc_pures. iDestruct "Hl1'" as "[-> Hl1']".
       do 9 wpcc_pure. iApply (wpcc_bind _ [AppRCtx _]).
       iApply ("IH" with "Hl1' Hl2").
@@ -93,10 +93,10 @@ Section list_lib.
     wp/cc list_reverse l @ b {{ Q }}.
   Proof.
     iInduction xs as [|x xs] "IH" forall (l Q).
-    - iIntros "Hl HQ". rewrite /list_reverse //=.
+    - iIntros "Hl HQ". rw /list_reverse //=.
       wpcc_pures. iDestruct "Hl" as "->". wpcc_pures.
       by iApply "HQ".
-    - iIntros "[%l' Hl'] HQ". rewrite /list_reverse //=.
+    - iIntros "[%l' Hl'] HQ". rw /list_reverse //=.
       wpcc_pures. iDestruct "Hl'" as "[-> Hl']".
       do 9 wpcc_pure. iApply (wpcc_bind _ [AppRCtx _]).
       iApply list_singleton_spec.
@@ -106,7 +106,7 @@ Section list_lib.
       iIntros "!> %l Hl". simpl.
       iApply (list_concat_spec _ _ _ [x] with "Hl Hlx").
       iIntros "!> %l'' Hl''". iApply "HQ".
-      by rewrite reverse_cons.
+      by rw reverse_cons.
   Qed.
 
   Lemma list_empty_spec l xs b Q :
@@ -114,7 +114,7 @@ Section list_lib.
     ▷ Q #(bool_decide (xs = [])) -∗
     wp/cc list_empty l @ b {{ Q }}.
   Proof.
-    destruct xs as [|x xs]; rewrite /list_empty //=.
+    destruct xs as [|x xs]; rw /list_empty //=.
     - iIntros "Hl HQ". wpcc_pures.
       iDestruct "Hl" as "->". by wpcc_pures.
     - iIntros "[% Hl] HQ". wpcc_pures.
