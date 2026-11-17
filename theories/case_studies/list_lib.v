@@ -1,6 +1,6 @@
 (* list_lib.v *)
 
-From iris.proofmode Require Import base tactics classes.
+From iris.proofmode Require Import base proofmode classes.
 From iris.algebra Require Import frac cmra list agree.
 From callcc_logics Require Import logic state proofmode.
 

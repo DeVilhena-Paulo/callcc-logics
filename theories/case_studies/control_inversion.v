@@ -1,6 +1,6 @@
 (* control_inversion.v *)
 
-From iris.proofmode Require Import base tactics classes.
+From iris.proofmode Require Import base proofmode classes.
 From callcc_logics Require Import logic state proofmode.
 
 
@@ -41,7 +41,7 @@ Section lazy_sequences.
   Local Instance isSeq_pre_contractive : Contractive isSeq_pre.
   Proof.
     rewrite /isSeq_pre /isHead_pre => n isSeq isSeq' HisSeq ???.
-    f_equiv=>?. simpl. repeat (f_contractive || f_equiv). by apply HisSeq.
+    f_equiv=>?. simpl. repeat (f_contractive || f_equiv); try by apply HisSeq.
   Qed.
   Definition isSeq_def : val -d> list val -d> list val -d> iPropO Σ :=
     fixpoint (isSeq_pre).

@@ -1,7 +1,7 @@
 (* lifting.v *)
 
 From iris.proofmode Require Import proofmode.
-From iris.program_logic Require Import weakestpre lifting.
+From iris.program_logic Require Import language weakestpre lifting.
 From callcc_logics Require Import syntax semantics iris_instantiation tactics.
 
 (** Lifting lemmas where we can do a [base_step] under an evaluation context.
@@ -20,11 +20,11 @@ Section lifting.
     ⊢ WP fill k1 e1 @ s; E {{ Φ }}.
   Proof.
     iIntros (He1) "H". iApply wp_lift_step; first by apply fill_not_val.
-    iIntros (σ1 ns κ κs nt) "Hσ1". iMod ("H" with "Hσ1") as "[% H]".
+    iIntros (σ1 ns κs nt) "Hσ1". iMod ("H" $! σ1 ns [] κs with "Hσ1") as "[% H]".
     iMod (fupd_mask_subseteq ∅) as "Hclose"; first set_solver; iModIntro.
     iSplit; first destruct s; auto using base_reducible_reducible; try done.
-    iNext. iIntros (e2 σ2 efs Hstep) "Hcred". iMod "Hclose" as "_".
-    destruct κ as [|??]; last done.
+    iNext. iIntros (e2 σ2 efs κ κs' Hκs Hstep) "Hcred". iMod "Hclose" as "_".
+    destruct κ as [|??]; last done. simpl in Hκs; subst κs'.
     apply base_reducible_prim_step_ctx in Hstep as (k' & e' & -> & Hstep); last done.
     by iApply "H".
   Qed.
@@ -40,11 +40,11 @@ Section lifting.
     ⊢ WP fill k1 e1 @ s; E1 {{ Φ }}.
   Proof.
     iIntros (?) "H". iApply wp_lift_step_fupd; first by apply fill_not_val.
-    iIntros (σ1 ns κ κs nt) "Hσ1". iMod ("H" with "Hσ1") as "[% H]".
+    iIntros (σ1 ns κs nt) "Hσ1". iMod ("H" $! σ1 ns [] κs with "Hσ1") as "[% H]".
     iMod (fupd_mask_subseteq ∅) as "Hclose"; first set_solver; iModIntro.
     iSplit; first by destruct s; auto using reducible_fill, base_reducible_reducible.
-    iIntros (e2 σ2 efs Hstep) "Hcred". iMod "Hclose" as "_".
-    destruct κ as [|??]; last done.
+    iIntros (e2 σ2 efs κ κs' Hκs Hstep) "Hcred". iMod "Hclose" as "_".
+    destruct κ as [|??]; last done. simpl in Hκs; subst κs'.
     apply base_reducible_prim_step_ctx in Hstep as (k' & e' & -> & Hstep); last done.
     iMod ("H" with "[//] Hcred") as "H".
     iMod (fupd_mask_subseteq ∅) as "Hclose"; first set_solver; iModIntro.

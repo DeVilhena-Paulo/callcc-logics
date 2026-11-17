@@ -35,8 +35,8 @@ export OPAMYES=true
 
 opam switch create \
   --no-install \
-  --repositories=default,coq-released=https://coq.inria.fr/opam/released,iris-dev=git+https://gitlab.mpi-sws.org/iris/opam.git \
-  . ocaml-base-compiler.5.3.0
+  --repositories=default,rocq-prover-released=https://rocq-prover.org/opam/released,iris-dev=git+https://gitlab.mpi-sws.org/iris/opam.git \
+  . ocaml-base-compiler.5.5.2
 
 eval $(opam env)
 

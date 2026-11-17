@@ -21,6 +21,9 @@ _build
 .Makefile.coq.d
 Makefile.coq
 Makefile.coq.conf
+.Makefile.rocq.d
+Makefile.rocq
+Makefile.rocq.conf
 .vscode
 .DS_Store
 

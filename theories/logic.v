@@ -1,6 +1,6 @@
 (* logic.v *)
 
-From iris.proofmode Require Export tactics.
+From iris.proofmode Require Export proofmode.
 From iris.prelude Require Import options.
 
 From iris.algebra Require Import list.
@@ -526,8 +526,8 @@ Section reasoning_rules.
     { apply of_to_val in He as ->. simpl. by iApply fupd_wp. }
     rewrite wp_unfold /wp_pre. simpl.
     rewrite fill_not_val He //=.
-    iIntros (σ1 step κ κs n) "Hσ".
-    iSpecialize ("Hwp" $! σ1 step κ κs n with "Hσ").
+    iIntros (σ1 step κs n) "Hσ".
+    iSpecialize ("Hwp" $! σ1 step κs n with "Hσ").
     iMod "Hwp" as "[%Hreducible Hwp]".
     iModIntro; iSplit.
     { iPureIntro. destruct Hreducible as (κ' & e' & σ' & efs & Hstep).
@@ -536,10 +536,10 @@ Section reasoning_rules.
       exists [], (fill k e2'), σ', efs. simpl.
       by apply Hstep_ectx.
     }
-    iIntros "%e2 %σ2 %efs %Hstep Hcred".
+    iIntros "%e2 %σ2 %efs %κ %κs' %Hκs %Hstep Hcred".
     destruct κ => //=. simpl in Hstep.
     destruct (Hatomic _ _ _ _ _ Hstep) as (e2' & -> & He2' & Hstep_ectx).
-    iSpecialize ("Hwp" $! e2' σ2 efs with "[]").
+    iSpecialize ("Hwp" $! e2' σ2 efs [] κs' with "[//] []").
     { by iPureIntro; apply (Hstep_ectx []). }
     iMod ("Hwp" with "Hcred") as "Hwp". iIntros "!>!>".
     iMod "Hwp". iModIntro. iApply (step_fupdN_wand with "Hwp"). iIntros "Hwp".

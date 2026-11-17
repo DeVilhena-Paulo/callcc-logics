@@ -1,7 +1,7 @@
 (* proofmode.v. *)
 
 From iris.program_logic Require Import weakestpre lifting.
-From iris.proofmode Require Import coq_tactics reduction.
+From iris.proofmode Require Import rocq_tactics reduction.
 
 From callcc_logics Require Export logic class_instances tactics.
 

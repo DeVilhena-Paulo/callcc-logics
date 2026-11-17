@@ -1,6 +1,6 @@
 (* stack_lib.v *)
 
-From iris.proofmode Require Import base tactics classes.
+From iris.proofmode Require Import base proofmode classes.
 From callcc_logics Require Import logic state proofmode list_lib.
 
 Section stack_lib.

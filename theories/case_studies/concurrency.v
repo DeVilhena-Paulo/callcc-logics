@@ -1,6 +1,6 @@
 (* concurrency.v *)
 
-From iris.proofmode Require Import base tactics classes.
+From iris.proofmode Require Import base proofmode classes.
 From callcc_logics Require Import logic state proofmode.
 From callcc_logics.case_studies Require Import queue_lib.
 

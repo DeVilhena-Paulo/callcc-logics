@@ -1,6 +1,6 @@
 (* effect_handlers.v *)
 
-From iris.proofmode Require Import base tactics classes.
+From iris.proofmode Require Import base proofmode classes.
 From iris.algebra Require Import frac cmra list agree.
 From callcc_logics Require Import logic state proofmode.
 From callcc_logics.case_studies Require Import control_inversion stack_lib.

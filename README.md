@@ -57,15 +57,15 @@ opam switch create ocaml-base-compiler.5.3.0
 **Step 2.** Add `Rocq`'s and `Iris`'s `opam` repositories:
 
 ```
-opam repo add coq-released https://coq.inria.fr/opam/released
+opam repo add rocq-prover-released https://rocq-prover.org/opam/released
 opam repo add iris-dev https://gitlab.mpi-sws.org/iris/opam.git
 ```
 
 **Step 3.** Install `Rocq` and `Iris` with the following commands:
 
 ```
-opam install coq.9.1.1
-opam install coq-iris-heap-lang.dev.2025-08-04.0.264b2923
+opam install rocq-prover.9.3.0
+opam install rocq-iris-heap-lang.dev.2026-11-16.0.e20f2f0f
 ```
 
 **Step 4.** Run `make` to compile the proofs.
